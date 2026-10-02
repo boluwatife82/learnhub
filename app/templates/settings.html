@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% set active_page = "settings" %}
+
+{% block title %}Settings - LearnHub{% endblock %}
+{% block page_title %}Settings{% endblock %}
+{% block page_subtitle %}Manage your profile and account security.{% endblock %}
+
+{% block content %}
+
+<div class="card" style="max-width: 700px; margin-bottom:16px;">
+  <div class="card-header">
+    <h3>Profile Information</h3>
+  </div>
+
+  <form method="POST">
+    {{ profile_form.hidden_tag() }}
+
+    <div class="form-row">
+      <div class="form-group">
+        {{ profile_form.full_name.label }}
+        {{ profile_form.full_name() }}
+      </div>
+      <div class="form-group">
+        {{ profile_form.email.label }}
+        {{ profile_form.email() }}
+      </div>
+    </div>
+
+    {% if current_user.role == 'student' %}
+      <div class="form-row">
+        <div class="form-group">
+          {{ profile_form.department_id.label }}
+          {{ profile_form.department_id() }}
+        </div>
+        <div class="form-group">
+          {{ profile_form.level_id.label }}
+          {{ profile_form.level_id() }}
+        </div>
+      </div>
+      <div class="form-group">
+        {{ profile_form.preferred_resource_type.label }}
+        {{ profile_form.preferred_resource_type() }}
+      </div>
+    {% endif %}
+
+    {% if current_user.role == 'lecturer' %}
+      <div class="form-row">
+        <div class="form-group">
+          {{ profile_form.faculty_id.label }}
+          {{ profile_form.faculty_id() }}
+        </div>
+        <div class="form-group">
+          {{ profile_form.department_id.label }}
+          {{ profile_form.department_id() }}
+        </div>
+      </div>
+      <div class="form-group">
+        {{ profile_form.specialization.label }}
+        {{ profile_form.specialization() }}
+      </div>
+    {% endif %}
+
+    {% if current_user.role == 'alumni' %}
+      <div class="form-group">
+        {{ profile_form.degree_class.label }}
+        {{ profile_form.degree_class() }}
+      </div>
+    {% endif %}
+
+    {{ profile_form.submit_profile(class="btn btn-primary") }}
+  </form>
+</div>
+
+<div class="card" style="max-width: 700px;">
+  <div class="card-header">
+    <h3>Change Password</h3>
+  </div>
+
+  <form method="POST">
+    {{ password_form.hidden_tag() }}
+
+    <div class="form-group">
+      {{ password_form.current_password.label }}
+      {{ password_form.current_password() }}
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        {{ password_form.new_password.label }}
+        {{ password_form.new_password() }}
+      </div>
+      <div class="form-group">
+        {{ password_form.confirm_new_password.label }}
+        {{ password_form.confirm_new_password() }}
+      </div>
+    </div>
+
+    {{ password_form.submit_password(class="btn btn-success") }}
+  </form>
+</div>
+
+{% endblock %}

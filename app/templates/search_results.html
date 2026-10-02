@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% set active_page = "browse" %}
+
+{% block title %}Search - LearnHub{% endblock %}
+{% block page_title %}Search Results{% endblock %}
+{% block page_subtitle %}
+  {% if query_text %}
+    Showing results for "{{ query_text }}"
+  {% else %}
+    Enter a search term to find resources.
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+
+{% if query_text and resources %}
+  <div class="resource-grid">
+    {% for resource in resources %}
+      <div class="resource-card">
+        <span class="resource-type-badge {{ resource.resource_type }}">
+          {% if resource.resource_type == 'pdf' %}<i class="fa-solid fa-file-pdf"></i>{% endif %}
+          {% if resource.resource_type == 'youtube' %}<i class="fa-brands fa-youtube"></i>{% endif %}
+          {% if resource.resource_type == 'textbook' %}<i class="fa-solid fa-book"></i>{% endif %}
+          {{ resource.resource_type|upper }}
+        </span>
+
+        <h4>{{ resource.title }}</h4>
+        <div class="resource-meta">{{ resource.course.course_code }} &middot; {{ resource.level.level_number }} Level</div>
+        <div class="resource-meta">{{ resource.uploader.full_name }}</div>
+
+        <div class="resource-stats">
+          <span><i class="fa-solid fa-star"></i> {{ resource.ratings|length }}</span>
+          <span><i class="fa-solid fa-download"></i> {{ resource.downloads|length }}</span>
+          <span><i class="fa-solid fa-thumbs-up"></i> {{ resource.votes|length }}</span>
+        </div>
+
+        <a href="{{ url_for('resources.view', resource_id=resource.id) }}" class="btn btn-outline btn-block">View</a>
+      </div>
+    {% endfor %}
+  </div>
+{% elif query_text %}
+  <div class="card">
+    <p style="color: var(--muted);">No resources found matching "{{ query_text }}". Try a different search term.</p>
+  </div>
+{% else %}
+  <div class="card">
+    <p style="color: var(--muted);">Use the search bar above to find resources by title or description.</p>
+  </div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnHub — Find the resources your seniors wish they'd had</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- HERO -->
+<section class="landing-hero">
+  <nav class="landing-nav">
+    <div class="brand">
+      <div class="brand-badge"><i class="fa-solid fa-graduation-cap"></i></div>
+      LearnHub
+    </div>
+    <div class="landing-nav-links">
+      <a href="#how-it-works">How it works</a>
+      <a href="#for-everyone">Who it's for</a>
+      <a href="{{ url_for('auth.login') }}">Login</a>
+      <a href="{{ url_for('auth.register_choice') }}" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <div class="hero-grid">
+    <div>
+      <div class="hero-eyebrow"><span class="dot"></span> Built for Nigerian university students</div>
+      <h1 class="hero-headline">Find the notes<br>your <em>seniors</em> wish<br>they'd had.</h1>
+      <p class="hero-sub">
+        LearnHub matches you with past questions, lecture notes, and video walkthroughs from your own department —
+        ranked by what actually helped students like you, not just what's popular everywhere.
+      </p>
+      <div class="hero-ctas">
+        <a href="{{ url_for('auth.register_choice') }}" class="btn btn-primary">Create your account</a>
+        <a href="#how-it-works" class="btn btn-outline" style="background:transparent; border-color: rgba(255,255,255,0.25); color:#fff;">See how it works</a>
+      </div>
+      
+    </div>
+
+    <div class="hero-feed" id="hero-feed">
+      {% for resource in recent_resources %}
+        <div class="feed-card" data-index="{{ loop.index0 }}">
+          <div class="feed-card-label">
+            {% if resource.resource_type == 'pdf' %}<i class="fa-solid fa-file-pdf"></i>{% endif %}
+            {% if resource.resource_type == 'youtube' %}<i class="fa-brands fa-youtube"></i>{% endif %}
+            {% if resource.resource_type == 'textbook' %}<i class="fa-solid fa-book"></i>{% endif %}
+            {{ resource.resource_type|upper }} &middot; {{ resource.course.course_code }}
+          </div>
+          <div class="feed-card-title">{{ resource.title }}</div>
+          <div class="feed-card-meta">{{ resource.department.name }} &middot; shared by {{ resource.uploader.full_name }}</div>
+        </div>
+      {% endfor %}
+      <div class="hero-feed-caption">Live from the resource library</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stats-strip-inner">
+    <div class="stats-strip-item"><strong>{{ total_resources }}</strong><span>Approved resources</span></div>
+    <div class="stats-strip-item"><strong>{{ total_students }}</strong><span>Students on LearnHub</span></div>
+    <div class="stats-strip-item"><strong>{{ total_universities }}</strong><span>Universities represented</span></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="landing-section" id="how-it-works-features">
+  <div class="section-eyebrow">Why it's different</div>
+  <h2 class="section-title">Recommendations that actually know your department</h2>
+  <p class="section-desc">Most platforms show you what's popular everywhere. LearnHub blends three signals so what you see is actually relevant to you.</p>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background: var(--blue);"><i class="fa-solid fa-bullseye"></i></div>
+      <h4>Matched to your profile</h4>
+      <p>Your department, level, and stated interests are compared against every resource's content to surface what actually fits — even before you've clicked anything.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: var(--orange);"><i class="fa-solid fa-fire"></i></div>
+      <h4>Trending in your department</h4>
+      <p>Ratings, votes, and downloads from students in your own department surface what's genuinely proving useful right now — not what's popular platform-wide.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background: var(--green);"><i class="fa-solid fa-shield-check"></i></div>
+      <h4>Reviewed before it reaches you</h4>
+      <p>Every upload is checked by an admin before it's visible. Alumni and lecturers are verified with real documents before they can vote.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="landing-section" style="background: var(--bg); max-width:none; padding-left:0; padding-right:0;" id="how-it-works">
+  <div style="max-width:1180px; margin:0 auto; padding:0 48px;">
+    <div class="section-eyebrow">The process</div>
+    <h2 class="section-title">From sign-up to your first recommendation</h2>
+    <p class="section-desc">A new account gets real, useful recommendations from day one — no waiting around for the system to "learn" you.</p>
+
+    <div class="steps-list">
+      <div class="step-item">
+        <div class="step-number">01</div>
+        <h4>Register</h4>
+        <p>Tell us your university, department, level, and what kind of resources you prefer.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-number">02</div>
+        <h4>Get matched</h4>
+        <p>See resources ranked by how well they fit your profile, immediately — no interaction history needed.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-number">03</div>
+        <h4>Rate & vote</h4>
+        <p>Download, rate, and vote on what helps. Voting is limited to levels you've already completed.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-number">04</div>
+        <h4>It gets sharper</h4>
+        <p>Recommendations blend your personal fit with what's trending in your department — improving as more students engage.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROLES -->
+<section class="landing-section landing-roles" id="for-everyone">
+  <div class="section-eyebrow">Who it's for</div>
+  <h2 class="section-title">One platform, three ways to contribute</h2>
+  <p class="section-desc">Whether you're studying, teaching, or years out and giving back — there's a place for you.</p>
+
+  <div class="feature-grid">
+    <a href="{{ url_for('auth.register_student') }}" class="role-card-lg">
+      <div class="role-icon-lg"><i class="fa-solid fa-user-graduate"></i></div>
+      <h4>Student</h4>
+      <p>Discover resources matched to your department and level, then rate and vote on what actually helps.</p>
+      <span class="role-cta">Register as a student <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
+    <a href="{{ url_for('auth.register_lecturer') }}" class="role-card-lg">
+      <div class="role-icon-lg"><i class="fa-solid fa-chalkboard-user"></i></div>
+      <h4>Lecturer</h4>
+      <p>Upload resources for your students and see what's actually being used, downloaded, and rated.</p>
+      <span class="role-cta">Register as a lecturer <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
+    <a href="{{ url_for('auth.register_alumni') }}" class="role-card-lg">
+      <div class="role-icon-lg"><i class="fa-solid fa-user-tie"></i></div>
+      <h4>Alumni</h4>
+      <p>Share what helped you succeed and guide current students, once your account is verified.</p>
+      <span class="role-cta">Register as alumni <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="landing-footer">
+  <div class="landing-footer-inner">
+    <div>
+      <div class="brand"><div class="brand-badge"><i class="fa-solid fa-graduation-cap"></i></div> LearnHub</div>
+      <p class="landing-footer-note">A resource discovery platform built for Nigerian university students — matching content, community trends, and department context into one recommendation.</p>
+    </div>
+    <div style="display:flex; gap:48px; flex-wrap:wrap;">
+      <div>
+        <div style="color:#fff; font-weight:600; margin-bottom:10px; font-size:0.85rem;">Platform</div>
+        <div style="display:flex; flex-direction:column; gap:8px; font-size:0.85rem;">
+          <a href="{{ url_for('auth.register_choice') }}" style="color:#93a4cf;">Get Started</a>
+          <a href="{{ url_for('auth.login') }}" style="color:#93a4cf;">Login</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; {{ recent_resources[0].created_at.year if recent_resources else 2026 }} LearnHub. Built for students, by students.</div>
+</footer>
+
+<script>
+  const cards = document.querySelectorAll('.feed-card');
+  let current = 0;
+
+  function showCard(i) {
+    cards.forEach(c => c.classList.remove('active'));
+    if (cards[i]) cards[i].classList.add('active');
+    if (cards[(i + 1) % cards.length]) cards[(i + 1) % cards.length].classList.add('active');
+  }
+
+  if (cards.length) {
+    showCard(current);
+    setInterval(() => {
+      current = (current + 1) % cards.length;
+      showCard(current);
+    }, 3500);
+  }
+</script>
+
+</body>
+</html>

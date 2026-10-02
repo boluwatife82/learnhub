@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% set active_page = "dashboard" %}
+
+{% block title %}Admin Dashboard - LearnHub{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Plan, monitor and manage LearnHub with ease.{% endblock %}
+
+{% block topbar_actions %}
+<div class="action-row">
+  <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline"><i class="fa-solid fa-arrows-rotate"></i> Refresh</a>
+  <a href="{{ url_for('admin.academic') }}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Faculty/Course</a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="stat-grid">
+  <div class="stat-card dark">
+    <div class="stat-top">
+      Total Students
+      <div class="stat-icon"><i class="fa-solid fa-user-graduate"></i></div>
+    </div>
+    <div class="stat-value">{{ total_students }}</div>
+    <div class="stat-note">Registered in the system</div>
+  </div>
+
+  <div class="stat-card accent-purple">
+    <div class="stat-top">
+      Lecturers
+      <div class="stat-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+    </div>
+    <div class="stat-value">{{ total_lecturers }}</div>
+    <div class="stat-note">Active lecturers</div>
+  </div>
+
+  <div class="stat-card accent-blue">
+    <div class="stat-top">
+      Resources
+      <div class="stat-icon"><i class="fa-solid fa-book"></i></div>
+    </div>
+    <div class="stat-value">{{ total_resources }}</div>
+    <div class="stat-note">Learning materials</div>
+  </div>
+
+  <div class="stat-card accent-green">
+    <div class="stat-top">
+      Interactions
+      <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
+    </div>
+    <div class="stat-value">{{ total_interactions }}</div>
+    <div class="stat-note">Views, downloads, ratings</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h3>Platform Analytics</h3>
+      <span style="color: var(--muted); font-size: 0.8rem;">Weekly interaction activity</span>
+    </div>
+  </div>
+  <div class="bar-chart">
+    {% for label in chart_labels %}
+      <div class="bar-col">
+        <div class="bar {{ 'filled' if chart_values[loop.index0] > 0 else '' }}"
+             style="height: {{ (chart_values[loop.index0] / max_chart_value * 100)|round }}%;"
+             title="{{ chart_values[loop.index0] }} interactions"></div>
+        <div class="bar-label">{{ label }}</div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="content-grid" style="margin-top:16px;">
+
+  <!-- LEFT: Recent registrations + Pending resources -->
+  <div style="display:flex; flex-direction:column; gap:16px;">
+
+    <div class="card">
+      <div class="card-header">
+        <h3>Recent Registrations</h3>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem;">View All</a>
+      </div>
+
+      {% for u in recent_users %}
+        <div class="registration-item">
+          <div class="registration-left">
+            <div class="registration-avatar">{{ u.full_name[0] }}</div>
+            <div>
+              <div class="registration-name">{{ u.full_name }}</div>
+              <div class="registration-meta">{{ u.email }}</div>
+            </div>
+          </div>
+          <span class="role-pill {{ u.role }}">{{ u.role }}</span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>Pending Resources</h3>
+        <span style="color: var(--muted); font-size: 0.85rem;">{{ pending_count }} awaiting review</span>
+      </div>
+
+      {% if pending_resources %}
+        {% for resource in pending_resources[:5] %}
+          <div style="display:flex; justify-content:space-between; align-items:center; padding: 14px 0; border-bottom: 1px solid var(--border);">
+            <div>
+              <div style="font-weight:600;">{{ resource.title }}</div>
+              <div style="font-size:0.85rem; color: var(--muted);">
+                {{ resource.resource_type|upper }} &middot; Uploaded by {{ resource.uploader.full_name }}
+              </div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <form method="POST" action="{{ url_for('admin.approve_resource', resource_id=resource.id) }}">
+                <button type="submit" class="btn btn-success" style="padding: 8px 16px;">
+                  <i class="fa-solid fa-check"></i> Approve
+                </button>
+              </form>
+              <form method="POST" action="{{ url_for('admin.reject_resource', resource_id=resource.id) }}">
+                <button type="submit" class="btn btn-outline" style="padding: 8px 16px; color: #dc2626; border-color: #dc2626;">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="color: var(--muted); font-size: 0.9rem;">No resources pending review right now.</p>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- RIGHT: User breakdown + Top resources + Most active students -->
+  <div style="display:flex; flex-direction:column; gap:16px;">
+
+    <div class="card">
+      <div class="card-header">
+        <h3>Approval Rate</h3>
+      </div>
+      <div class="breakdown-row">
+        <div class="progress-ring" style="--pct: {{ approval_rate }}; width:110px; height:110px;">
+          <div class="progress-value" style="font-size:1.2rem;">{{ approval_rate }}%</div>
+        </div>
+        <div class="breakdown-legend">
+          <div class="breakdown-legend-item">
+            <span class="label"><span class="legend-dot" style="background: var(--green);"></span> Approved</span>
+            <span class="value">{{ approved_count }}</span>
+          </div>
+          <div class="breakdown-legend-item">
+            <span class="label"><span class="legend-dot" style="background: var(--orange);"></span> Pending</span>
+            <span class="value">{{ pending_count }}</span>
+          </div>
+          <div class="breakdown-legend-item">
+            <span class="label"><span class="legend-dot" style="background: #dc2626;"></span> Rejected</span>
+            <span class="value">{{ rejected_count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>Top Resources</h3>
+      </div>
+      {% if top_resources %}
+        {% for resource in top_resources %}
+          <div class="ranked-row">
+            <div class="ranked-badge">{{ loop.index }}</div>
+            <div>
+              <div class="ranked-title">{{ resource.title }}</div>
+              <div class="ranked-subtitle">{{ resource.course.course_code }}</div>
+            </div>
+            <div class="ranked-value">{{ resource.downloads|length }}v</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="color: var(--muted); font-size: 0.9rem;">No resources yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>Most Active Students</h3>
+      </div>
+      {% if most_active_students %}
+        {% for student, count in most_active_students %}
+          <div class="ranked-row">
+            <div class="ranked-badge">{{ loop.index }}</div>
+            <div>
+              <div class="ranked-title">{{ student.user.full_name }}</div>
+              <div class="ranked-subtitle">{{ student.department.name }}</div>
+            </div>
+            <div class="ranked-value">{{ count }}</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="color: var(--muted); font-size: 0.9rem;">No student activity yet.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - LearnHub</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  
+</head>
+<body>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <!-- Left navy panel -->
+    <div class="auth-panel">
+     <a href="{{ url_for('auth.landing') }}" class="brand" style="text-decoration:none;">
+        <div class="brand-badge"><i class="fa-solid fa-graduation-cap"></i>
+         
+        </div>
+        <span>LearnHub</span>
+      </a>
+
+      <h1>Discover the Best Learning Resources For Your Courses</h1>
+      <p class="lead">Get personalized recommendations from lecturers, seniors and alumni.</p>
+
+      <img class="illustration" src="{{ url_for('static', filename='img/login-illustration.png') }}" alt="Students studying together">
+    </div>
+
+    <!-- Right form panel -->
+    <div class="auth-form-side">
+      <a href="{{ url_for('auth.landing') }}" style="display:inline-flex; align-items:center; gap:6px; color: var(--muted); font-size:0.85rem; margin-bottom:16px;">
+        <i class="fa-solid fa-arrow-left"></i> Back to home
+      </a>
+      <h2>Welcome Back!</h2>
+      <p class="subtitle">Login to access your personalized dashboard.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+          {{ form.email.label }}
+          {{ form.email(placeholder="you@example.com") }}
+        </div>
+
+        <div class="form-group">
+          {{ form.password.label }}
+          {{ form.password(placeholder="Enter your password") }}
+        </div>
+
+        <div class="checkbox-row">
+          <label><input type="checkbox" name="remember_check"> Remember me</label>
+          <a href="#">Forgot Password?</a>
+        </div>
+
+        {{ form.submit(class="btn btn-primary btn-block") }}
+      </form>
+
+     
+      <p style="text-align:center; margin-top: 20px; font-size: 0.9rem;">
+        Don't have an account? <a href="{{ url_for('auth.register_choice') }}">Register here</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% set active_page = "help" %}
+
+{% block title %}Help - LearnHub{% endblock %}
+{% block page_title %}Help & FAQ{% endblock %}
+{% block page_subtitle %}How LearnHub works and answers to common questions.{% endblock %}
+
+{% block content %}
+
+<div class="card" style="max-width: 800px;">
+  <div class="card-header">
+    <h3>Getting Started</h3>
+  </div>
+  <p style="color: var(--text); margin-bottom: 12px;">
+    LearnHub helps you discover learning resources — PDFs, YouTube videos, and textbook references — matched to your department, level, and interests. Recommendations improve over time based on your activity and what's popular across the community.
+  </p>
+</div>
+
+<div class="card" style="max-width: 800px; margin-top:16px;">
+  <div class="card-header">
+    <h3>Frequently Asked Questions</h3>
+  </div>
+
+  <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+    <div style="font-weight:600; margin-bottom:6px;">How do recommendations work?</div>
+    <p style="color: var(--muted); font-size:0.9rem;">
+      LearnHub combines two signals: how well a resource matches your stated interests and preferences (content-based), and how popular a resource is across the whole community based on ratings, votes, and downloads. These are blended into one score to rank what's shown to you.
+    </p>
+  </div>
+
+  <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+    <div style="font-weight:600; margin-bottom:6px;">Why can't I vote on some resources?</div>
+    <p style="color: var(--muted); font-size:0.9rem;">
+      Students can only vote on resources from levels they've already completed. For example, a 300 Level student can vote on 100 and 200 Level resources, but not 300 or 400 Level ones.
+    </p>
+  </div>
+
+  <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+    <div style="font-weight:600; margin-bottom:6px;">Why does my Alumni/Lecturer account say "Pending"?</div>
+    <p style="color: var(--muted); font-size:0.9rem;">
+      Alumni and Lecturer accounts require admin verification before they can vote. You can still browse and upload resources while pending. Verification is typically reviewed based on the document you uploaded during registration.
+    </p>
+  </div>
+
+  <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+    <div style="font-weight:600; margin-bottom:6px;">What happens after I upload a resource?</div>
+    <p style="color: var(--muted); font-size:0.9rem;">
+      Every upload is reviewed by an admin before it becomes visible to other users. You'll see its status (Pending, Approved, or Rejected) on your dashboard.
+    </p>
+  </div>
+
+  <div style="padding: 12px 0;">
+    <div style="font-weight:600; margin-bottom:6px;">How do I save a resource for later?</div>
+    <p style="color: var(--muted); font-size:0.9rem;">
+      Click "Save" on any resource's detail page to add it to your My Library. You can unsave it the same way at any time.
+    </p>
+  </div>
+</div>
+
+{% endblock %}

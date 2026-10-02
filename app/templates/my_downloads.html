@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% set active_page = "downloads" %}
+
+{% block title %}My Downloads - LearnHub{% endblock %}
+{% block page_title %}My Downloads{% endblock %}
+{% block page_subtitle %}Resources you've downloaded.{% endblock %}
+
+{% block content %}
+
+{% if downloads %}
+  <div class="card">
+    {% for d in downloads %}
+      <div style="display:flex; justify-content:space-between; align-items:center; padding: 14px 0; border-bottom: 1px solid var(--border);">
+        <div>
+          <div style="font-weight:600;">{{ d.resource.title }}</div>
+          <div style="font-size:0.85rem; color: var(--muted);">
+            {{ d.resource.resource_type|upper }} &middot;
+            {{ d.resource.course.course_code }} &middot;
+            Downloaded {{ d.downloaded_at.strftime('%b %d, %Y %I:%M %p') }}
+          </div>
+        </div>
+        <a href="{{ url_for('resources.view', resource_id=d.resource.id) }}" class="btn btn-outline">View</a>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card">
+    <p style="color: var(--muted);">You haven't downloaded anything yet.</p>
+  </div>
+{% endif %}
+
+{% endblock %}

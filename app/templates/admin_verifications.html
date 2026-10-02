@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% set active_page = "verifications" %}
+
+{% block title %}Verifications - LearnHub{% endblock %}
+{% block page_title %}Verifications{% endblock %}
+{% block page_subtitle %}Review documents and verify Alumni and Lecturer accounts.{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <div class="card-header">
+    <h3>Alumni Pending Verification</h3>
+  </div>
+
+  {% if unverified_alumni %}
+    {% for alumni in unverified_alumni %}
+      <div style="display:flex; justify-content:space-between; align-items:center; padding: 14px 0; border-bottom: 1px solid var(--border);">
+        <div>
+          <div style="font-weight:600;">{{ alumni.user.full_name }}</div>
+          <div style="font-size:0.85rem; color: var(--muted);">
+            {{ alumni.user.email }} &middot;
+            Matric: {{ alumni.matric_number }} &middot;
+            Graduated {{ alumni.graduation_year }} &middot;
+            {{ alumni.degree_class or "No degree class listed" }}
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          {% if alumni.verification_document %}
+            <a href="{{ alumni.verification_document }}" target="_blank" ...
+              <i class="fa-solid fa-file"></i> View Document
+            </a>
+          {% else %}
+            <span style="color:#dc2626; font-size:0.8rem;">No document uploaded</span>
+          {% endif %}
+          <form method="POST" action="{{ url_for('admin.verify_alumni', user_id=alumni.user_id) }}">
+            <button type="submit" class="btn btn-success">
+              <i class="fa-solid fa-check"></i> Verify
+            </button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="color: var(--muted);">No pending alumni verifications.</p>
+  {% endif %}
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <div class="card-header">
+    <h3>Lecturers Pending Verification</h3>
+  </div>
+
+  {% if unverified_lecturers %}
+    {% for lecturer in unverified_lecturers %}
+      <div style="display:flex; justify-content:space-between; align-items:center; padding: 14px 0; border-bottom: 1px solid var(--border);">
+        <div>
+          <div style="font-weight:600;">{{ lecturer.user.full_name }}</div>
+          <div style="font-size:0.85rem; color: var(--muted);">
+            {{ lecturer.user.email }} &middot;
+            {{ lecturer.department.name }}, {{ lecturer.faculty.name }} &middot;
+            {{ lecturer.specialization or "No specialization listed" }}
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          {% if lecturer.verification_document %}
+            <a href="{{ alumni.verification_document }}" target="_blank" ...
+            
+              <i class="fa-solid fa-file"></i> View Document
+            </a>
+          {% else %}
+            <span style="color:#dc2626; font-size:0.8rem;">No document uploaded</span>
+          {% endif %}
+          <form method="POST" action="{{ url_for('admin.verify_lecturer', user_id=lecturer.user_id) }}">
+            <button type="submit" class="btn btn-success">
+              <i class="fa-solid fa-check"></i> Verify
+            </button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="color: var(--muted);">No pending lecturer verifications.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

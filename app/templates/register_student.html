@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register as Student - LearnHub</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <div class="auth-panel" id="side-panel">
+      <div class="brand">
+        <div class="brand-badge"><i class="fa-solid fa-graduation-cap"></i></div>
+        <span>LearnHub</span>
+      </div>
+      <h1 id="side-title">Let's build your learning profile</h1>
+      <p class="lead" id="side-text">This helps us recommend the best resources for you.</p>
+      <img class="illustration" src="{{ url_for('static', filename='img/register-illustration.png') }}" alt="Student building profile">
+    </div>
+
+    <div class="auth-form-side">
+      <a href="{{ url_for('auth.landing') }}" style="display:inline-flex; align-items:center; gap:6px; color: var(--muted); font-size:0.85rem; margin-bottom:16px;">
+        <i class="fa-solid fa-arrow-left"></i> Back to home
+      </a>
+      <h2>Create Student Profile</h2>
+      <p class="subtitle" id="step-label">Step 1 of 3</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="step-indicator">
+        <div class="step active" id="indicator-1">
+          <div class="circle">1</div>
+          <div class="label">Academic Info</div>
+          <div class="line"></div>
+        </div>
+        <div class="step" id="indicator-2">
+          <div class="circle">2</div>
+          <div class="label">Learning Preferences</div>
+          <div class="line"></div>
+        </div>
+        <div class="step" id="indicator-3">
+          <div class="circle">3</div>
+          <div class="label">Interests &amp; Security</div>
+        </div>
+      </div>
+
+      <form method="POST" novalidate id="register-form">
+        {{ form.hidden_tag() }}
+
+        {% if form.errors %}
+          <div class="flash flash-danger">
+            <strong>Please fix the following:</strong>
+            <ul style="margin: 8px 0 0 20px;">
+              {% for field_name, error_list in form.errors.items() %}
+                {% for error in error_list %}
+                  <li>{{ field_name }}: {{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <!-- STEP 1: Academic Info -->
+        <div class="form-step active" data-step="1">
+          <div class="form-row">
+            <div class="form-group">
+              {{ form.full_name.label }}
+              {{ form.full_name(placeholder="Enter your full name", required=true) }}
+            </div>
+            <div class="form-group">
+              {{ form.matric_number.label }}
+              {{ form.matric_number(placeholder="e.g. CSC/2022/001", required=true) }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            {{ form.email.label }}
+            {{ form.email(placeholder="you@example.com", required=true) }}
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              {{ form.faculty_id.label }}
+              {{ form.faculty_id(required=true) }}
+            </div>
+            <div class="form-group">
+              {{ form.department_id.label }}
+              {{ form.department_id(required=true) }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            {{ form.level_id.label }}
+            {{ form.level_id(required=true) }}
+          </div>
+
+          <div class="btn-row" style="justify-content: flex-end;">
+            <button type="button" class="btn btn-primary next-step">Continue →</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Learning Preferences -->
+        <div class="form-step" data-step="2">
+          <div class="form-group">
+            <label>What type of resources do you prefer?</label>
+            {{ form.preferred_resource_type() }}
+          </div>
+
+          <div class="btn-row">
+            <button type="button" class="btn btn-outline prev-step">← Back</button>
+            <button type="button" class="btn btn-primary next-step">Continue →</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Interests & Security -->
+        <div class="form-step" data-step="3">
+          {% set all_fields = form.interest_tags|list %}
+
+          <div class="form-group">
+            <label>Learning Goals <span style="font-weight:400; color: var(--muted);">(select up to 3)</span></label>
+            <div class="checklist">
+              <ul>
+                {% for f in all_fields[0:8] %}
+                  <li>{{ f() }} <label for="{{ f.id }}">{{ f.label.text }}</label></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Preferred Learning Style</label>
+            <div class="checklist">
+              <ul>
+                {% for f in all_fields[8:16] %}
+                  <li>{{ f() }} <label for="{{ f.id }}">{{ f.label.text }}</label></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Preferred Resource Format</label>
+            <div class="checklist">
+              <ul>
+                {% for f in all_fields[16:19] %}
+                  <li>{{ f() }} <label for="{{ f.id }}">{{ f.label.text }}</label></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Academic Interests</label>
+            <div class="checklist">
+              <ul>
+                {% for f in all_fields[19:27] %}
+                  <li>{{ f() }} <label for="{{ f.id }}">{{ f.label.text }}</label></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              {{ form.password.label }}
+              {{ form.password(placeholder="Create a strong password", required=true) }}
+            </div>
+            <div class="form-group">
+              {{ form.confirm_password.label }}
+              {{ form.confirm_password(placeholder="Confirm your password", required=true) }}
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="button" class="btn btn-outline prev-step">← Back</button>
+            {{ form.submit(class="btn btn-success") }}
+          </div>
+        </div>
+
+      </form>
+
+      <p style="text-align:center; margin-top: 20px; font-size: 0.9rem;">
+        Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const steps = document.querySelectorAll('.form-step');
+  const indicators = document.querySelectorAll('.step-indicator .step');
+  const stepLabel = document.getElementById('step-label');
+  let currentStep = 1;
+
+  function showStep(stepNum) {
+    steps.forEach(s => s.classList.remove('active'));
+    document.querySelector(`.form-step[data-step="${stepNum}"]`).classList.add('active');
+
+    indicators.forEach((ind, i) => {
+      ind.classList.remove('active', 'done');
+      if (i + 1 < stepNum) ind.classList.add('done');
+      if (i + 1 === stepNum) ind.classList.add('active');
+    });
+
+    stepLabel.textContent = `Step ${stepNum} of 3`;
+    currentStep = stepNum;
+  }
+
+  function validateCurrentStep() {
+    const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+    const requiredFields = currentStepEl.querySelectorAll('input[required], select[required]');
+
+    let firstInvalid = null;
+
+    for (const field of requiredFields) {
+      if (!field.value || field.value.trim() === '') {
+        field.classList.add('field-error');
+        if (!firstInvalid) firstInvalid = field;
+      } else {
+        field.classList.remove('field-error');
+      }
+    }
+
+    if (firstInvalid) {
+      firstInvalid.focus();
+      return false;
+    }
+    return true;
+  }
+
+  document.querySelectorAll('.next-step').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!validateCurrentStep()) return;
+      if (currentStep < 3) showStep(currentStep + 1);
+    });
+  });
+
+  document.querySelectorAll('.prev-step').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (currentStep > 1) showStep(currentStep - 1);
+    });
+  });
+</script>
+
+</body>
+</html>

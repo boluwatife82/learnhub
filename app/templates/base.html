@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}LearnHub{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-badge"><i class="fa-solid fa-graduation-cap"></i></div>
+      <span>LearnHub</span>
+    </div>
+
+   <div class="nav-label">Menu</div>
+    <nav>
+      {% if current_user.role == 'admin' %}
+        <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if active_page == 'dashboard' }}"><i class="fa-solid fa-chart-simple"></i> Dashboard</a>
+        <a href="{{ url_for('admin.all_resources') }}" class="{{ 'active' if active_page == 'browse' }}"><i class="fa-solid fa-book-open"></i> All Resources</a>
+        <a href="{{ url_for('admin.users') }}" class="{{ 'active' if active_page == 'users' }}"><i class="fa-solid fa-users"></i> Manage Users</a>
+        <a href="{{ url_for('admin.verifications') }}" class="{{ 'active' if active_page == 'verifications' }}"><i class="fa-solid fa-user-check"></i> Verifications</a>
+        <a href="{{ url_for('admin.academic') }}" class="{{ 'active' if active_page == 'academic' }}"><i class="fa-solid fa-building-columns"></i> Manage Academic Structure</a>
+        <a href="{{ url_for('admin.recommendation_settings') }}" class="{{ 'active' if active_page == 'recommendation_settings' }}"><i class="fa-solid fa-sliders"></i> Recommendation Settings</a>
+
+      {% elif current_user.role in ['alumni', 'lecturer'] %}
+        <a href="{{ url_for('auth.dashboard') }}" class="{{ 'active' if active_page == 'dashboard' }}"><i class="fa-solid fa-chart-simple"></i> Dashboard</a>
+        <a href="{{ url_for('resources.browse') }}" class="{{ 'active' if active_page == 'browse' }}"><i class="fa-solid fa-book-open"></i> Browse Resources</a>
+        <a href="{{ url_for('resources.my_votes') }}" class="{{ 'active' if active_page == 'votes' }}"><i class="fa-solid fa-thumbs-up"></i> My Votes</a>
+        {% if current_user.role == 'alumni' %}
+        <a href="{{ url_for('resources.my_library') }}" class="{{ 'active' if active_page == 'library' }}"><i class="fa-solid fa-folder"></i> My Library</a>
+        {% endif %}
+
+      {% else %}
+        <a href="{{ url_for('auth.dashboard') }}" class="{{ 'active' if active_page == 'dashboard' }}"><i class="fa-solid fa-chart-simple"></i> Dashboard</a>
+        <a href="{{ url_for('auth.recommended') }}" class="{{ 'active' if active_page == 'recommended' }}"><i class="fa-solid fa-lightbulb"></i> Recommended</a>
+        <a href="{{ url_for('resources.browse') }}" class="{{ 'active' if active_page == 'browse' }}"><i class="fa-solid fa-book-open"></i> Browse Resources</a>
+        <a href="{{ url_for('resources.my_library') }}" class="{{ 'active' if active_page == 'library' }}"><i class="fa-solid fa-folder"></i> My Library</a>
+        <a href="{{ url_for('resources.my_downloads') }}" class="{{ 'active' if active_page == 'downloads' }}"><i class="fa-solid fa-download"></i> Downloads</a>
+        <a href="{{ url_for('resources.my_ratings') }}" class="{{ 'active' if active_page == 'ratings' }}"><i class="fa-solid fa-star"></i> My Ratings</a>
+      {% endif %}
+    </nav>
+
+    <div class="nav-label">General</div>
+    <nav>
+      <a href="{{ url_for('auth.settings') }}" class="{{ 'active' if active_page == 'settings' }}"><i class="fa-solid fa-gear"></i> Settings</a>
+      <a href="{{ url_for('auth.help_page') }}" class="{{ 'active' if active_page == 'help' }}"><i class="fa-solid fa-circle-question"></i> Help</a>
+      <a href="{{ url_for('auth.logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </nav>
+  </aside>
+
+  <!-- Right side: topbar + content -->
+  <div>
+    <div class="topbar">
+      <button class="mobile-menu-toggle" id="menu-toggle" aria-label="Open menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <button class="mobile-search-toggle" id="search-toggle" aria-label="Open search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+
+      <form class="topbar-search" id="topbar-search-form" action="{{ url_for('resources.search') }}" method="GET" style="padding:0;">
+        <i class="fa-solid fa-magnifying-glass" style="margin-left:14px; color: var(--muted);"></i>
+        <input type="text" name="q" placeholder="Search resources..." value="{{ request.args.get('q', '') }}"
+               style="border:none; background:transparent; outline:none; padding:10px 14px; width:100%; font-size:0.9rem; font-family: var(--font-body);">
+        <button type="button" class="mobile-search-close" id="search-close" aria-label="Close search">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </form>
+
+      <div class="topbar-right">
+        <div class="topbar-icon"><i class="fa-regular fa-envelope"></i></div>
+        <div class="topbar-icon"><i class="fa-regular fa-bell"></i></div>
+        <div class="topbar-user">
+          <div class="topbar-avatar">{{ current_user.full_name[0] if current_user.is_authenticated else "?" }}</div>
+          <div>
+            <div class="name">{{ current_user.full_name if current_user.is_authenticated else "Guest" }}</div>
+            <div class="email">{{ current_user.email if current_user.is_authenticated else "" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="main-content">
+      <div class="page-heading">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+            <p>{% block page_subtitle %}{% endblock %}</p>
+          </div>
+          <div>{% block topbar_actions %}{% endblock %}</div>
+        </div>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+
+
+</div>
+
+
+<script>
+  const menuToggle = document.getElementById('menu-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+
+  function openSidebar() {
+    sidebar.classList.add('open');
+    overlay.classList.add('active');
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+  }
+
+  if (menuToggle) {
+    menuToggle.addEventListener('click', openSidebar);
+  }
+  if (overlay) {
+    overlay.addEventListener('click', closeSidebar);
+  }
+
+  const searchToggle = document.getElementById('search-toggle');
+  const searchForm = document.getElementById('topbar-search-form');
+  const searchClose = document.getElementById('search-close');
+
+  if (searchToggle) {
+    searchToggle.addEventListener('click', () => {
+      searchForm.classList.add('mobile-open');
+      searchForm.querySelector('input').focus();
+    });
+  }
+  if (searchClose) {
+    searchClose.addEventListener('click', (e) => {
+      e.preventDefault();
+      searchForm.classList.remove('mobile-open');
+    });
+  }
+</script>
+</body>
+</html>

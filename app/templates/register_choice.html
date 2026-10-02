@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - LearnHub</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+<div class="choice-wrapper">
+  <div class="choice-card">
+    <a href="{{ url_for('auth.landing') }}" style="display:inline-flex; align-items:center; gap:6px; color: var(--muted); font-size:0.85rem; margin-bottom:16px;">
+      <i class="fa-solid fa-arrow-left"></i> Back to home
+    </a>
+    <h1>Join LearnHub</h1>
+    <p class="lead">Tell us who you are so we can set up the right profile for you.</p>
+
+    <div class="role-options">
+      <a href="{{ url_for('auth.register_student') }}" class="role-option">
+        <div class="role-icon"><i class="fa-solid fa-user-graduate"></i></div>
+        <h3>Student</h3>
+        <p>Discover and rate learning resources for your courses.</p>
+      </a>
+
+      <a href="{{ url_for('auth.register_lecturer') }}" class="role-option">
+        <div class="role-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+        <h3>Lecturer</h3>
+        <p>Upload and recommend resources to your students.</p>
+      </a>
+
+      <a href="{{ url_for('auth.register_alumni') }}" class="role-option">
+        <div class="role-icon"><i class="fa-solid fa-user-tie"></i></div>
+        <h3>Alumni</h3>
+        <p>Share resources and guide current students.</p>
+      </a>
+    </div>
+
+    <p style="margin-top: 28px; font-size: 0.9rem;">
+      Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
+    </p>
+  </div>
+</div>
+
+</body>
+</html>

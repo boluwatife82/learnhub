@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% set active_page = "dashboard" %}
+
+{% block title %}Dashboard - LearnHub{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}
+  Lecturer Portal &mdash;
+  {{ current_user.lecturer_profile.department.name }}, {{ current_user.lecturer_profile.faculty.name }}
+{% endblock %}
+
+{% block topbar_actions %}
+<div class="action-row">
+  {% if current_user.lecturer_profile.specialization %}
+    <span class="portal-badge" style="background: rgba(245, 158, 11, 0.12); color: var(--orange); margin: 0;">
+      {{ current_user.lecturer_profile.specialization }}
+    </span>
+  {% endif %}
+  <a href="{{ url_for('resources.upload') }}" class="btn btn-primary">
+    <i class="fa-solid fa-plus"></i> Upload Resource
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="portal-badge">Lecturer Portal</div>
+
+<div class="stat-grid" style="grid-template-columns: repeat(5, 1fr);">
+  <div class="stat-card dark">
+    <div class="stat-top">
+      Resources Uploaded
+      <div class="stat-icon"><i class="fa-solid fa-file"></i></div>
+    </div>
+    <div class="stat-value">{{ upload_count }}</div>
+  </div>
+
+  <div class="stat-card accent-blue">
+    <div class="stat-top">
+      Total Views
+      <div class="stat-icon"><i class="fa-solid fa-eye"></i></div>
+    </div>
+    <div class="stat-value">{{ total_views }}</div>
+  </div>
+
+  <div class="stat-card accent-green">
+    <div class="stat-top">
+      Downloads
+      <div class="stat-icon"><i class="fa-solid fa-download"></i></div>
+    </div>
+    <div class="stat-value">{{ total_downloads }}</div>
+  </div>
+
+  <div class="stat-card accent-orange">
+    <div class="stat-top">
+      Ratings Received
+      <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+    </div>
+    <div class="stat-value">{{ total_ratings }}</div>
+  </div>
+
+  <div class="stat-card accent-purple">
+    <div class="stat-top">
+      Avg Rating
+      <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+    </div>
+    <div class="stat-value">{{ overall_avg_rating if overall_avg_rating else "—" }}</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3>My Uploaded Resources</h3>
+    <span style="color: var(--muted); font-size: 0.85rem;">{{ upload_count }} resources uploaded</span>
+  </div>
+
+  {% if my_uploads %}
+    <div class="resource-manage-grid">
+      {% for resource in my_uploads %}
+        {% set stats = resource_stats[resource.id] %}
+        <div class="resource-manage-card">
+          <div class="type-tag">
+            {% if resource.resource_type == 'pdf' %}PDF{% elif resource.resource_type == 'youtube' %}YT{% else %}TXT{% endif %}
+          </div>
+
+          <h4>{{ resource.title }}</h4>
+          <span class="course-tag">{{ resource.course.course_code }}</span>
+
+          <div style="font-size:0.8rem; color: var(--muted); margin-bottom: 4px;">
+            Status:
+            <span style="color: {{ 'var(--green)' if resource.status == 'approved' else ('var(--orange)' if resource.status == 'pending' else '#dc2626') }}; font-weight:600;">
+              {{ resource.status|upper }}
+            </span>
+          </div>
+
+          <div class="resource-manage-stats">
+            <div><strong>{{ stats.views }}</strong>Views</div>
+            <div><strong>{{ stats.downloads }}</strong>Downloads</div>
+            <div><strong>{{ stats.avg_rating if stats.avg_rating else "—" }}</strong>Avg Rating</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="color: var(--muted);">You haven't uploaded anything yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% set active_page = "academic" %}
+
+{% block title %}Manage Academic Structure - LearnHub{% endblock %}
+{% block page_title %}Manage Academic Structure{% endblock %}
+{% block page_subtitle %}Add faculties, departments, and courses.{% endblock %}
+
+{% block content %}
+
+<div class="academic-section card">
+
+    <div class="academic-section card">
+  <div class="card-header"><h3>Add University</h3></div>
+  <form method="POST">
+    {{ university_form.hidden_tag() }}
+    <div class="academic-form-row">
+      <div class="form-group">
+        {{ university_form.name.label }}
+        {{ university_form.name(placeholder="e.g. University of Lagos") }}
+      </div>
+      {{ university_form.submit_university(class="btn btn-primary") }}
+    </div>
+  </form>
+
+  <details style="margin-top: 12px;">
+    <summary style="cursor:pointer; color: var(--blue); font-size: 0.85rem; font-weight:600;">
+      View all faculties ({{ faculties|length }})
+    </summary>
+    <table class="simple-table" style="margin-top: 10px;">
+      <thead><tr><th>Faculty</th><th>University</th></tr></thead>
+      <tbody>
+        {% for f in faculties %}
+          <tr><td>{{ f.name }}</td><td>{{ f.university.name }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </details>
+</div>
+
+  <div class="card-header"><h3>Add Faculty</h3></div>
+  <form method="POST">
+    {{ faculty_form.hidden_tag() }}
+    <div class="academic-form-row">
+      <div class="form-group">
+        {{ faculty_form.name.label }}
+        {{ faculty_form.name(placeholder="e.g. Faculty of Computing") }}
+      </div>
+      <div class="form-group">
+        {{ faculty_form.university_id.label }}
+        {{ faculty_form.university_id() }}
+      </div>
+      {{ faculty_form.submit_faculty(class="btn btn-primary") }}
+    </div>
+  </form>
+
+  <details style="margin-top: 12px;">
+    <summary style="cursor:pointer; color: var(--blue); font-size: 0.85rem; font-weight:600;">
+      View all faculties ({{ faculties|length }})
+    </summary>
+    <table class="simple-table" style="margin-top: 10px;">
+      <thead><tr><th>Faculty</th><th>University</th></tr></thead>
+      <tbody>
+        {% for f in faculties %}
+          <tr><td>{{ f.name }}</td><td>{{ f.university.name }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </details>
+</div>
+
+<div class="academic-section card">
+  <div class="card-header"><h3>Add Department</h3></div>
+  <form method="POST">
+    {{ department_form.hidden_tag() }}
+    <div class="academic-form-row">
+      <div class="form-group">
+        {{ department_form.name.label }}
+        {{ department_form.name(placeholder="e.g. Computer Science") }}
+      </div>
+      <div class="form-group">
+        {{ department_form.faculty_id.label }}
+        {{ department_form.faculty_id() }}
+      </div>
+      {{ department_form.submit_department(class="btn btn-primary") }}
+    </div>
+  </form>
+
+  <details style="margin-top: 12px;">
+    <summary style="cursor:pointer; color: var(--blue); font-size: 0.85rem; font-weight:600;">
+      View all departments ({{ departments|length }})
+    </summary>
+    <table class="simple-table" style="margin-top: 10px;">
+      <thead><tr><th>Department</th><th>Faculty</th></tr></thead>
+      <tbody>
+        {% for d in departments %}
+          <tr><td>{{ d.name }}</td><td>{{ d.faculty.name }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </details>
+</div>
+
+<div class="academic-section card">
+  <div class="card-header"><h3>Add Course</h3></div>
+  <form method="POST">
+    {{ course_form.hidden_tag() }}
+    <div class="academic-form-row">
+      <div class="form-group">
+        {{ course_form.course_code.label }}
+        {{ course_form.course_code(placeholder="e.g. CSC201") }}
+      </div>
+      <div class="form-group">
+        {{ course_form.course_title.label }}
+        {{ course_form.course_title(placeholder="e.g. Data Structures") }}
+      </div>
+      <div class="form-group">
+        {{ course_form.department_id.label }}
+        {{ course_form.department_id() }}
+      </div>
+      <div class="form-group">
+        {{ course_form.level_id.label }}
+        {{ course_form.level_id() }}
+      </div>
+      {{ course_form.submit_course(class="btn btn-primary") }}
+    </div>
+  </form>
+
+  <details style="margin-top: 12px;">
+    <summary style="cursor:pointer; color: var(--blue); font-size: 0.85rem; font-weight:600;">
+      View all courses ({{ courses|length }})
+    </summary>
+    <table class="simple-table" style="margin-top: 10px;">
+      <thead><tr><th>Code</th><th>Title</th><th>Department</th><th>Level</th></tr></thead>
+      <tbody>
+        {% for c in courses %}
+          <tr><td>{{ c.course_code }}</td><td>{{ c.course_title }}</td><td>{{ c.department.name }}</td><td>{{ c.level.level_number }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </details>
+</div>
+
+{% endblock %}

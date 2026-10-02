@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% set active_page = "votes" %}
+
+{% block title %}My Votes - LearnHub{% endblock %}
+{% block page_title %}My Votes{% endblock %}
+{% block page_subtitle %}Resources you've endorsed.{% endblock %}
+
+{% block content %}
+
+{% if votes %}
+  <div class="card">
+    {% for v in votes %}
+      <div style="display:flex; justify-content:space-between; align-items:center; padding: 14px 0; border-bottom: 1px solid var(--border);">
+        <div>
+          <div style="font-weight:600;">{{ v.resource.title }}</div>
+          <div style="font-size:0.85rem; color: var(--muted);">
+            {{ v.resource.course.course_code }} &middot; Voted on {{ v.created_at.strftime('%b %d, %Y') }}
+          </div>
+        </div>
+        <a href="{{ url_for('resources.view', resource_id=v.resource.id) }}" class="btn btn-outline">View</a>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card">
+    <p style="color: var(--muted);">You haven't voted on anything yet.</p>
+  </div>
+{% endif %}
+
+{% endblock %}

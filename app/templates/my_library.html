@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% set active_page = "library" %}
+
+{% block title %}My Library - LearnHub{% endblock %}
+{% block page_title %}My Library{% endblock %}
+{% block page_subtitle %}Resources you've saved, downloaded, and rated.{% endblock %}
+
+{% block content %}
+
+<div class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
+  <div class="stat-card dark">
+    <div class="stat-top">
+      Saved Resources
+      <div class="stat-icon"><i class="fa-solid fa-bookmark"></i></div>
+    </div>
+    <div class="stat-value">{{ bookmarks|length }}</div>
+    <div class="stat-note">In your library</div>
+  </div>
+
+  <div class="stat-card accent-blue">
+    <div class="stat-top">
+      Downloads
+      <div class="stat-icon"><i class="fa-solid fa-download"></i></div>
+    </div>
+    <div class="stat-value">{{ download_count }}</div>
+    <div class="stat-note">Total downloads</div>
+  </div>
+
+  <div class="stat-card accent-orange">
+    <div class="stat-top">
+      Ratings Given
+      <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+    </div>
+    <div class="stat-value">{{ rating_count }}</div>
+    <div class="stat-note">Resources you've rated</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3>Saved Resources</h3>
+  </div>
+
+  {% if bookmarks %}
+    <div class="resource-grid">
+      {% for b in bookmarks %}
+        <div class="resource-card">
+          <span class="resource-type-badge {{ b.resource.resource_type }}">
+            {% if b.resource.resource_type == 'pdf' %}<i class="fa-solid fa-file-pdf"></i>{% endif %}
+            {% if b.resource.resource_type == 'youtube' %}<i class="fa-brands fa-youtube"></i>{% endif %}
+            {% if b.resource.resource_type == 'textbook' %}<i class="fa-solid fa-book"></i>{% endif %}
+            {{ b.resource.resource_type|upper }}
+          </span>
+
+          <h4>{{ b.resource.title }}</h4>
+          <div class="resource-meta">{{ b.resource.course.course_code }} &middot; Saved {{ b.created_at.strftime('%b %d, %Y') }}</div>
+
+          <a href="{{ url_for('resources.view', resource_id=b.resource.id) }}" class="btn btn-outline btn-block">View</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="color: var(--muted);">You haven't saved any resources yet. Click "Save" on a resource to add it here.</p>
+  {% endif %}
+</div>
+
+<div class="content-grid" style="margin-top:16px;">
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Recent Downloads</h3>
+      <a href="{{ url_for('resources.my_downloads') }}" class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem;">View All</a>
+    </div>
+    {% if recent_downloads %}
+      {% for d in recent_downloads %}
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 0; border-bottom: 1px solid var(--border);">
+          <div>
+            <div style="font-weight:600; font-size:0.9rem;">{{ d.resource.title }}</div>
+            <div style="font-size:0.8rem; color: var(--muted);">{{ d.downloaded_at.strftime('%b %d, %Y') }}</div>
+          </div>
+          <a href="{{ url_for('resources.view', resource_id=d.resource.id) }}" class="btn btn-outline" style="padding:6px 12px; font-size:0.8rem;">View</a>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p style="color: var(--muted); font-size:0.9rem;">No downloads yet.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Recent Ratings</h3>
+      <a href="{{ url_for('resources.my_ratings') }}" class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem;">View All</a>
+    </div>
+    {% if recent_ratings %}
+      {% for r in recent_ratings %}
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 0; border-bottom: 1px solid var(--border);">
+          <div>
+            <div style="font-weight:600; font-size:0.9rem;">{{ r.resource.title }}</div>
+            <div style="font-size:0.8rem; color: #f59e0b;">
+              {% for i in range(r.rating_value) %}<i class="fa-solid fa-star"></i>{% endfor %}
+            </div>
+          </div>
+          <a href="{{ url_for('resources.view', resource_id=r.resource.id) }}" class="btn btn-outline" style="padding:6px 12px; font-size:0.8rem;">View</a>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p style="color: var(--muted); font-size:0.9rem;">No ratings yet.</p>
+    {% endif %}
+  </div>
+
+</div>
+
+{% endblock %}

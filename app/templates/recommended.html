@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% set active_page = "recommended" %}
+
+{% block title %}Recommended - LearnHub{% endblock %}
+{% block page_title %}Recommended for You{% endblock %}
+{% block page_subtitle %}Resources matched to your profile using content-based filtering.{% endblock %}
+
+{% block content %}
+
+{% if recommendations %}
+  <div class="resource-grid">
+    {% for resource, score in recommendations %}
+      <div class="resource-card">
+        <span class="resource-type-badge {{ resource.resource_type }}">
+          {% if resource.resource_type == 'pdf' %}<i class="fa-solid fa-file-pdf"></i>{% endif %}
+          {% if resource.resource_type == 'youtube' %}<i class="fa-brands fa-youtube"></i>{% endif %}
+          {% if resource.resource_type == 'textbook' %}<i class="fa-solid fa-book"></i>{% endif %}
+          {{ resource.resource_type|upper }}
+        </span>
+
+        <h4>{{ resource.title }}</h4>
+        <div class="resource-meta">{{ resource.course.course_code }} &middot; {{ resource.level.level_number }} Level</div>
+        <div class="resource-meta">{{ resource.uploader.full_name }}</div>
+        <div class="resource-meta" style="color: var(--blue); font-weight:600;">
+          {{ (score * 100)|round }}% match
+        </div>
+
+        <div class="resource-stats">
+          <span><i class="fa-solid fa-star"></i> {{ resource.ratings|length }}</span>
+          <span><i class="fa-solid fa-download"></i> {{ resource.downloads|length }}</span>
+          <span><i class="fa-solid fa-thumbs-up"></i> {{ resource.votes|length }}</span>
+        </div>
+
+        <a href="{{ url_for('resources.view', resource_id=resource.id) }}" class="btn btn-outline btn-block">View</a>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card">
+    <p style="color: var(--muted);">No recommendations yet — try adding more Learning Interests on your profile, or check back once more resources are uploaded.</p>
+  </div>
+{% endif %}
+
+{% endblock %}

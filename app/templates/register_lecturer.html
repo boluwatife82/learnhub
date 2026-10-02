@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register as Lecturer - LearnHub</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <div class="auth-panel">
+      <div class="brand">
+        <div class="brand-badge"><i class="fa-solid fa-graduation-cap"></i></div>
+        <span>LearnHub</span>
+      </div>
+      <h1>Share your expertise with students</h1>
+      <p class="lead">Upload resources and guide students toward what actually works.</p>
+      <img class="illustration" src="{{ url_for('static', filename='img/lecturer-illustration.png') }}" alt="Lecturer teaching">
+    </div>
+
+    <div class="auth-form-side">
+      <a href="{{ url_for('auth.landing') }}" style="display:inline-flex; align-items:center; gap:6px; color: var(--muted); font-size:0.85rem; margin-bottom:16px;">
+        <i class="fa-solid fa-arrow-left"></i> Back to home
+      </a>
+      <h2>Create Lecturer Profile</h2>
+      <p class="subtitle">Tell us about your department and specialization.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+            <form method="POST" enctype="multipart/form-data" novalidate>
+        {{ form.hidden_tag() }}
+
+        {% if form.errors %}
+          <div class="flash flash-danger">
+            <strong>Please fix the following:</strong>
+            <ul style="margin: 8px 0 0 20px;">
+              {% for field_name, error_list in form.errors.items() %}
+                {% for error in error_list %}
+                  <li>{{ field_name }}: {{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <div class="form-group">
+          {{ form.full_name.label }}
+          {{ form.full_name(placeholder="Enter your full name", required=true) }}
+        </div>
+
+        <div class="form-group">
+          {{ form.email.label }}
+          {{ form.email(placeholder="you@example.com", required=true) }}
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            {{ form.faculty_id.label }}
+            {{ form.faculty_id(required=true) }}
+          </div>
+          <div class="form-group">
+            {{ form.department_id.label }}
+            {{ form.department_id(required=true) }}
+          </div>
+        </div>
+
+                <div class="form-group">
+          {{ form.specialization.label }}
+          {{ form.specialization(placeholder="e.g. Machine Learning, Networks") }}
+        </div>
+
+        <div class="form-group">
+          {{ form.verification_document.label }}
+          {{ form.verification_document() }}
+          <p style="font-size:0.75rem; color: var(--muted); margin-top:4px;">Upload your staff ID, appointment letter, or department verification document for admin review.</p>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            {{ form.password.label }}
+            {{ form.password(placeholder="Create a strong password", required=true) }}
+          </div>
+          <div class="form-group">
+            {{ form.confirm_password.label }}
+            {{ form.confirm_password(placeholder="Confirm your password", required=true) }}
+          </div>
+        </div>
+
+        {{ form.submit(class="btn btn-success btn-block") }}
+      </form>
+
+      <p style="text-align:center; margin-top: 20px; font-size: 0.9rem;">
+        Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

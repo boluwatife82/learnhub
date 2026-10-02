@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+.env
+instance/
+*.db
+migrations/versions/__pycache__/
+.vscode/
+.DS_Store

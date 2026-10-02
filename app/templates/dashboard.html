@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% set active_page = "dashboard" %}
+
+{% block title %}Dashboard - LearnHub{% endblock %}
+{% block page_title %}Welcome, {{ current_user.full_name }} {% endblock %}
+{% block page_subtitle %}Here are recommended resources for you based on your profile.{% endblock %}
+
+{% block content %}
+
+<div class="stat-grid">
+  <div class="stat-card dark">
+    <div class="stat-top">
+      Total Resources
+      <div class="stat-icon"><i class="fa-solid fa-book"></i></div>
+    </div>
+    <div class="stat-value">{{ total_resources }}</div>
+    <div class="stat-note">Available in your department</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-top">
+      Recommended
+      <div class="stat-icon"><i class="fa-solid fa-lightbulb"></i></div>
+    </div>
+    <div class="stat-value">{{ recommendations|length }}</div>
+    <div class="stat-note">Picked for you</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-top">
+      Downloads
+      <div class="stat-icon"><i class="fa-solid fa-download"></i></div>
+    </div>
+    <div class="stat-value">{{ download_count }}</div>
+    <div class="stat-note">Your download history</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-top">
+      My Ratings
+      <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+    </div>
+    <div class="stat-value">{{ rating_count }}</div>
+    <div class="stat-note">Resources you've rated</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3>Recommended Resources</h3>
+  </div>
+
+  {% if recommendations %}
+    <div class="resource-grid">
+      {% for resource, score in recommendations %}
+        <div class="resource-card">
+          <span class="resource-type-badge {{ resource.resource_type }}">
+            {% if resource.resource_type == 'pdf' %}<i class="fa-solid fa-file-pdf"></i>{% endif %}
+            {% if resource.resource_type == 'youtube' %}<i class="fa-brands fa-youtube"></i>{% endif %}
+            {% if resource.resource_type == 'textbook' %}<i class="fa-solid fa-book"></i>{% endif %}
+            {{ resource.resource_type|upper }}
+          </span>
+
+          <h4>{{ resource.title }}</h4>
+          <div class="resource-meta">{{ resource.course.course_code }} &middot; {{ resource.level.level_number }} Level</div>
+          <div class="resource-meta" style="color: var(--blue); font-weight:600;">
+            {{ (score * 100)|round }}% match
+          </div>
+
+          <a href="{{ url_for('resources.view', resource_id=resource.id) }}" class="btn btn-outline btn-block">View</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="color: var(--muted); font-size: 0.9rem;">
+      No recommendations yet — try adding more Learning Interests, or check back once more resources are uploaded.
+    </p>
+
+    
+  {% endif %}
+</div>
+<div class="card" style="margin-top:16px;">
+  <div class="card-header">
+    <h3><i class="fa-solid fa-fire" style="color: var(--orange);"></i> Trending in Your Department</h3>
+  </div>
+
+  {% if community_recs %}
+    <div class="resource-grid">
+      {% for resource, score in community_recs %}
+        <div class="resource-card">
+          <span class="resource-type-badge {{ resource.resource_type }}">
+            {% if resource.resource_type == 'pdf' %}<i class="fa-solid fa-file-pdf"></i>{% endif %}
+            {% if resource.resource_type == 'youtube' %}<i class="fa-brands fa-youtube"></i>{% endif %}
+            {% if resource.resource_type == 'textbook' %}<i class="fa-solid fa-book"></i>{% endif %}
+            {{ resource.resource_type|upper }}
+          </span>
+
+          <h4>{{ resource.title }}</h4>
+          <div class="resource-meta">{{ resource.course.course_code }} &middot; {{ resource.level.level_number }} Level</div>
+
+          <div class="resource-stats">
+            <span><i class="fa-solid fa-star"></i> {{ resource.ratings|length }}</span>
+            <span><i class="fa-solid fa-download"></i> {{ resource.downloads|length }}</span>
+            <span><i class="fa-solid fa-thumbs-up"></i> {{ resource.votes|length }}</span>
+          </div>
+
+          <a href="{{ url_for('resources.view', resource_id=resource.id) }}" class="btn btn-outline btn-block">View</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="color: var(--muted); font-size: 0.9rem;">
+      No community activity yet — trending resources will appear here as students rate, vote, and download.
+    </p>
+  {% endif %}
+</div>
+
+{% endblock %}

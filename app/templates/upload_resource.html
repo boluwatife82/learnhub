@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% set active_page = "browse" %}
+
+{% block title %}Upload Resource - LearnHub{% endblock %}
+{% block page_title %}Upload a Resource{% endblock %}
+{% block page_subtitle %}Share a PDF, YouTube link, or textbook reference with your department.{% endblock %}
+
+{% block content %}
+
+<div class="card" style="max-width: 700px;">
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+      {{ form.title.label }}
+      {{ form.title(placeholder="e.g. Data Structures Complete Notes") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.description.label }}
+      {{ form.description(placeholder="Short description of this resource") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.resource_type.label }}
+      {{ form.resource_type(id="resource_type") }}
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        {{ form.university_id.label }}
+        {{ form.university_id() }}
+      </div>
+      <div class="form-group">
+        {{ form.faculty_id.label }}
+        {{ form.faculty_id() }}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        {{ form.department_id.label }}
+        {{ form.department_id() }}
+      </div>
+      <div class="form-group">
+        {{ form.level_id.label }}
+        {{ form.level_id() }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      {{ form.course_id.label }}
+      {{ form.course_id() }}
+    </div>
+
+    <!-- Shown only when resource_type = pdf -->
+    <div class="form-group" id="file-field">
+      {{ form.file.label }}
+      {{ form.file() }}
+    </div>
+
+    <!-- Shown only when resource_type = youtube or textbook -->
+    <div class="form-group" id="link-field">
+      {{ form.external_link.label }}
+      {{ form.external_link(placeholder="https://... or a textbook citation") }}
+    </div>
+
+    {{ form.submit(class="btn btn-primary") }}
+  </form>
+</div>
+
+<script>
+  const typeSelect = document.getElementById('resource_type');
+  const fileField = document.getElementById('file-field');
+  const linkField = document.getElementById('link-field');
+
+  function toggleFields() {
+    if (typeSelect.value === 'pdf') {
+      fileField.style.display = 'block';
+      linkField.style.display = 'none';
+    } else {
+      fileField.style.display = 'none';
+      linkField.style.display = 'block';
+    }
+  }
+
+  typeSelect.addEventListener('change', toggleFields);
+  toggleFields(); // run once on page load
+</script>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% set active_page = "ratings" %}
+
+{% block title %}My Ratings - LearnHub{% endblock %}
+{% block page_title %}My Ratings{% endblock %}
+{% block page_subtitle %}Resources you've rated.{% endblock %}
+
+{% block content %}
+
+{% if ratings %}
+  <div class="card">
+    {% for r in ratings %}
+      <div style="display:flex; justify-content:space-between; align-items:center; padding: 14px 0; border-bottom: 1px solid var(--border); flex-wrap:wrap; gap:10px;">
+        <div>
+          <div style="font-weight:600;">{{ r.resource.title }}</div>
+          <div style="font-size:0.85rem; color: var(--muted);">
+            {{ r.resource.course.course_code }} &middot; Rated on {{ r.created_at.strftime('%b %d, %Y') }}
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:nowrap; flex-shrink:0;">
+          <span style="color:#f59e0b; font-weight:700; white-space:nowrap;">
+            {% for i in range(r.rating_value) %}<i class="fa-solid fa-star"></i>{% endfor %}
+          </span>
+          <a href="{{ url_for('resources.view', resource_id=r.resource.id) }}" class="btn btn-outline" style="white-space:nowrap;">View</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card">
+    <p style="color: var(--muted);">You haven't rated anything yet.</p>
+  </div>
+{% endif %}
+
+{% endblock %}

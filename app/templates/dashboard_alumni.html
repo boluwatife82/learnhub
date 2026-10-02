@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% set active_page = "dashboard" %}
+
+{% block title %}Dashboard - LearnHub{% endblock %}
+{% block page_title %}Welcome, {{ current_user.full_name }}{% endblock %}
+{% block page_subtitle %}Share resources and help guide current students.{% endblock %}
+
+{% block topbar_actions %}
+<a href="{{ url_for('resources.upload') }}" class="btn btn-primary">
+  <i class="fa-solid fa-plus"></i> Upload Resource
+</a>
+{% endblock %}
+
+{% block content %}
+
+{% if not is_verified %}
+  <div class="flash flash-info" style="margin-bottom: 20px;">
+    <i class="fa-solid fa-circle-info"></i>
+    Your alumni account is pending verification. You can upload resources now, but you'll need admin verification before you can vote.
+  </div>
+{% endif %}
+
+<div class="stat-grid">
+  <div class="stat-card dark">
+    <div class="stat-top">
+      Verification Status
+      <div class="stat-icon"><i class="fa-solid {{ 'fa-circle-check' if is_verified else 'fa-hourglass-half' }}"></i></div>
+    </div>
+    <div class="stat-value" style="font-size: 1.2rem;">{{ "Verified" if is_verified else "Pending" }}</div>
+    <div class="stat-note">{{ "You can vote and recommend" if is_verified else "Awaiting admin review" }}</div>
+  </div>
+
+  <div class="stat-card accent-blue">
+    <div class="stat-top">
+      My Uploads
+      <div class="stat-icon"><i class="fa-solid fa-book"></i></div>
+    </div>
+    <div class="stat-value">{{ upload_count }}</div>
+    <div class="stat-note">Resources you've shared</div>
+  </div>
+
+  <div class="stat-card accent-purple">
+    <div class="stat-top">
+      My Votes
+      <div class="stat-icon"><i class="fa-solid fa-thumbs-up"></i></div>
+    </div>
+    <div class="stat-value">{{ vote_count }}</div>
+    <div class="stat-note">Resources you've endorsed</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3>My Uploaded Resources</h3>
+  </div>
+
+  {% if my_uploads %}
+    {% for resource in my_uploads %}
+      <div style="display:flex; justify-content:space-between; align-items:center; padding: 14px 0; border-bottom: 1px solid var(--border);">
+        <div>
+          <div style="font-weight:600;">{{ resource.title }}</div>
+          <div style="font-size:0.85rem; color: var(--muted);">
+            {{ resource.resource_type|upper }} &middot; {{ resource.created_at.strftime('%b %d, %Y') }}
+          </div>
+        </div>
+        <span class="resource-type-badge {{ 'pdf' if resource.status == 'pending' else ('textbook' if resource.status == 'approved' else 'youtube') }}">
+          {{ resource.status|upper }}
+        </span>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="color: var(--muted);">You haven't uploaded anything yet. Share a resource to help current students.</p>
+  {% endif %}
+</div>
+
+{% endblock %}
