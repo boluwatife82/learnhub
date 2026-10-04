@@ -26,7 +26,7 @@
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
           {% if alumni.verification_document %}
-            <a href="{{ alumni.verification_document }}" target="_blank" ...
+            <a href="{{ alumni.verification_document }}" target="_blank" rel="noopener">
               <i class="fa-solid fa-file"></i> View Document
             </a>
           {% else %}
@@ -63,8 +63,7 @@
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
           {% if lecturer.verification_document %}
-            <a href="{{ alumni.verification_document }}" target="_blank" ...
-            
+            <a href="{{ lecturer.verification_document }}" target="_blank" rel="noopener">
               <i class="fa-solid fa-file"></i> View Document
             </a>
           {% else %}
