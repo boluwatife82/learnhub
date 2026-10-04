@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 
 from app.extensions import db
@@ -118,6 +118,15 @@ def register_alumni():
             flash("An account with this email already exists.", "danger")
             return redirect(url_for("auth.register_alumni"))
 
+        # Save the file only after the checks pass, so failed registrations don't leave orphan uploads
+        from app.services.storage.file_storage import save_file
+        try:
+            doc_path = save_file(form.verification_document.data)
+        except Exception as e:
+            current_app.logger.error(f"Alumni document upload failed: {e}")
+            flash("We could not upload your document. Please try again.", "danger")
+            return render_template("register_alumni.html", form=form)
+
         new_user = User(full_name=form.full_name.data, email=form.email.data, role="alumni")
         new_user.set_password(form.password.data)
         db.session.add(new_user)
@@ -129,6 +138,7 @@ def register_alumni():
             graduation_year=form.graduation_year.data,
             degree_class=form.degree_class.data,
             is_verified=False,
+            verification_document=doc_path,
         )
         db.session.add(alumni)
         db.session.commit()
@@ -137,7 +147,6 @@ def register_alumni():
         return redirect(url_for("auth.login"))
 
     return render_template("register_alumni.html", form=form)
-
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
