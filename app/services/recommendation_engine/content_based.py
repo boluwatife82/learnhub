@@ -41,21 +41,39 @@ def build_resource_text(resource):
     return " ".join(parts)
 
 
+
 def get_content_based_recommendations(student, limit=10):
     """
-    Returns a list of (Resource, score) tuples, ranked by relevance
-    to the given student's profile, using TF-IDF + cosine similarity.
+    Returns content-based recommendations restricted to the student's
+    university, faculty, department and academic level.
+    TF-IDF + cosine similarity ranks eligible resources.
     """
-    approved_resources = Resource.query.filter_by(status="approved").all()
+
+    if not student or not student.department or not student.level:
+        return []
+
+    faculty = student.department.faculty
+
+    # STEP 1: Filter resources by the student's academic profile
+    approved_resources = Resource.query.filter(
+        Resource.status == "approved",
+        Resource.university_id == faculty.university_id,
+        Resource.faculty_id == faculty.id,
+        Resource.department_id == student.department_id,
+        Resource.level_id == student.level_id
+    ).all()
 
     if not approved_resources:
         return []
 
+    # STEP 2: Build student and resource text
     student_text = build_student_profile_text(student)
-    resource_texts = [build_resource_text(r) for r in approved_resources]
+    resource_texts = [
+        build_resource_text(resource)
+        for resource in approved_resources
+    ]
 
-    # The student profile goes in as the FIRST "document", so after vectorizing
-    # we can compare it (index 0) against every resource (index 1 onward)
+    # STEP 3: Convert text into TF-IDF vectors
     all_texts = [student_text] + resource_texts
 
     vectorizer = TfidfVectorizer(stop_words="english")
@@ -64,9 +82,20 @@ def get_content_based_recommendations(student, limit=10):
     student_vector = tfidf_matrix[0:1]
     resource_vectors = tfidf_matrix[1:]
 
-    similarity_scores = cosine_similarity(student_vector, resource_vectors)[0]
+    # STEP 4: Calculate cosine similarity
+    similarity_scores = cosine_similarity(
+        student_vector,
+        resource_vectors
+    )[0]
 
-    scored_resources = list(zip(approved_resources, similarity_scores))
-    scored_resources.sort(key=lambda pair: pair[1], reverse=True)
+    # STEP 5: Rank eligible resources by relevance
+    scored_resources = list(
+        zip(approved_resources, similarity_scores)
+    )
+
+    scored_resources.sort(
+        key=lambda pair: pair[1],
+        reverse=True
+    )
 
     return scored_resources[:limit]

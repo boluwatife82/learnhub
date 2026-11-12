@@ -28,11 +28,35 @@ def dashboard():
     from datetime import timedelta
     from app.models import Student, Lecturer, UserInteraction, User
 
+    print("\n===== DATABASE IDENTITY CHECK =====")
+    print("HOST:", db.engine.url.host)
+    print("DATABASE:", db.engine.url.database)
+    print("USERNAME:", db.engine.url.username)
+
+    identity = db.session.execute(
+        db.text("""
+            SELECT
+                current_database(),
+                current_schema(),
+                current_setting('search_path')
+        """)
+    ).fetchone()
+
+    print("DATABASE IDENTITY:", identity)
+    print("====================================\n")
+
     # Top-level counts
     total_students = Student.query.count()
     total_lecturers = Lecturer.query.count()
     total_resources = Resource.query.filter_by(status="approved").count()
     total_interactions = UserInteraction.query.count()
+
+    print("===== DASHBOARD DATABASE CHECK =====")
+    print("Students:", total_students)
+    print("Lecturers:", total_lecturers)
+    print("Resources:", total_resources)
+    print("Interactions:", total_interactions)
+    print("====================================")
 
     # Pending approval queue (kept from before — core admin task)
     pending_resources = Resource.query.filter_by(status="pending").order_by(Resource.created_at.desc()).all()

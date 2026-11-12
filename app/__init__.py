@@ -1,4 +1,4 @@
-from flask import Flask, app
+from flask import Flask
 from app.config import config_by_name
 from app.extensions import db, migrate, login_manager
 import cloudinary

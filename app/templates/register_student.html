@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,9 +24,11 @@
     </div>
 
     <div class="auth-form-side">
+
       <a href="{{ url_for('auth.landing') }}" style="display:inline-flex; align-items:center; gap:6px; color: var(--muted); font-size:0.85rem; margin-bottom:16px;">
         <i class="fa-solid fa-arrow-left"></i> Back to home
       </a>
+
       <h2>Create Student Profile</h2>
       <p class="subtitle" id="step-label">Step 1 of 3</p>
 
@@ -43,11 +46,13 @@
           <div class="label">Academic Info</div>
           <div class="line"></div>
         </div>
+
         <div class="step" id="indicator-2">
           <div class="circle">2</div>
           <div class="label">Learning Preferences</div>
           <div class="line"></div>
         </div>
+
         <div class="step" id="indicator-3">
           <div class="circle">3</div>
           <div class="label">Interests &amp; Security</div>
@@ -70,13 +75,15 @@
           </div>
         {% endif %}
 
-        <!-- STEP 1: Academic Info -->
+        <!-- STEP 1: Academic Information -->
         <div class="form-step active" data-step="1">
+
           <div class="form-row">
             <div class="form-group">
               {{ form.full_name.label }}
               {{ form.full_name(placeholder="Enter your full name", required=true) }}
             </div>
+
             <div class="form-group">
               {{ form.matric_number.label }}
               {{ form.matric_number(placeholder="e.g. CSC/2022/001", required=true) }}
@@ -88,15 +95,23 @@
             {{ form.email(placeholder="you@example.com", required=true) }}
           </div>
 
+          <div class="form-group">
+            {{ form.university_id.label }}
+            {{ form.university_id(required=true) }}
+          </div>
+
           <div class="form-row">
+
             <div class="form-group">
               {{ form.faculty_id.label }}
-              {{ form.faculty_id(required=true) }}
+              {{ form.faculty_id(required=true, disabled=true) }}
             </div>
+
             <div class="form-group">
               {{ form.department_id.label }}
-              {{ form.department_id(required=true) }}
+              {{ form.department_id(required=true, disabled=true) }}
             </div>
+
           </div>
 
           <div class="form-group">
@@ -105,33 +120,53 @@
           </div>
 
           <div class="btn-row" style="justify-content: flex-end;">
-            <button type="button" class="btn btn-primary next-step">Continue →</button>
+            <button type="button" class="btn btn-primary next-step">
+              Continue →
+            </button>
           </div>
+
         </div>
 
         <!-- STEP 2: Learning Preferences -->
         <div class="form-step" data-step="2">
+
           <div class="form-group">
             <label>What type of resources do you prefer?</label>
             {{ form.preferred_resource_type() }}
           </div>
 
           <div class="btn-row">
-            <button type="button" class="btn btn-outline prev-step">← Back</button>
-            <button type="button" class="btn btn-primary next-step">Continue →</button>
+            <button type="button" class="btn btn-outline prev-step">
+              ← Back
+            </button>
+
+            <button type="button" class="btn btn-primary next-step">
+              Continue →
+            </button>
           </div>
+
         </div>
 
         <!-- STEP 3: Interests & Security -->
         <div class="form-step" data-step="3">
+
           {% set all_fields = form.interest_tags|list %}
 
           <div class="form-group">
-            <label>Learning Goals <span style="font-weight:400; color: var(--muted);">(select up to 3)</span></label>
+            <label>
+              Learning Goals
+              <span style="font-weight:400; color: var(--muted);">
+                (select up to 3)
+              </span>
+            </label>
+
             <div class="checklist">
               <ul>
                 {% for f in all_fields[0:8] %}
-                  <li>{{ f() }} <label for="{{ f.id }}">{{ f.label.text }}</label></li>
+                  <li>
+                    {{ f() }}
+                    <label for="{{ f.id }}">{{ f.label.text }}</label>
+                  </li>
                 {% endfor %}
               </ul>
             </div>
@@ -139,10 +174,14 @@
 
           <div class="form-group">
             <label>Preferred Learning Style</label>
+
             <div class="checklist">
               <ul>
                 {% for f in all_fields[8:16] %}
-                  <li>{{ f() }} <label for="{{ f.id }}">{{ f.label.text }}</label></li>
+                  <li>
+                    {{ f() }}
+                    <label for="{{ f.id }}">{{ f.label.text }}</label>
+                  </li>
                 {% endfor %}
               </ul>
             </div>
@@ -150,10 +189,14 @@
 
           <div class="form-group">
             <label>Preferred Resource Format</label>
+
             <div class="checklist">
               <ul>
                 {% for f in all_fields[16:19] %}
-                  <li>{{ f() }} <label for="{{ f.id }}">{{ f.label.text }}</label></li>
+                  <li>
+                    {{ f() }}
+                    <label for="{{ f.id }}">{{ f.label.text }}</label>
+                  </li>
                 {% endfor %}
               </ul>
             </div>
@@ -161,96 +204,270 @@
 
           <div class="form-group">
             <label>Academic Interests</label>
+
             <div class="checklist">
               <ul>
                 {% for f in all_fields[19:27] %}
-                  <li>{{ f() }} <label for="{{ f.id }}">{{ f.label.text }}</label></li>
+                  <li>
+                    {{ f() }}
+                    <label for="{{ f.id }}">{{ f.label.text }}</label>
+                  </li>
                 {% endfor %}
               </ul>
             </div>
           </div>
 
           <div class="form-row">
+
             <div class="form-group">
               {{ form.password.label }}
               {{ form.password(placeholder="Create a strong password", required=true) }}
             </div>
+
             <div class="form-group">
               {{ form.confirm_password.label }}
               {{ form.confirm_password(placeholder="Confirm your password", required=true) }}
             </div>
+
           </div>
 
           <div class="btn-row">
-            <button type="button" class="btn btn-outline prev-step">← Back</button>
+            <button type="button" class="btn btn-outline prev-step">
+              ← Back
+            </button>
+
             {{ form.submit(class="btn btn-success") }}
           </div>
+
         </div>
 
       </form>
 
       <p style="text-align:center; margin-top: 20px; font-size: 0.9rem;">
-        Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}">Login here</a>
       </p>
-    </div>
 
+    </div>
   </div>
 </div>
 
 <script>
-  const steps = document.querySelectorAll('.form-step');
-  const indicators = document.querySelectorAll('.step-indicator .step');
-  const stepLabel = document.getElementById('step-label');
+document.addEventListener("DOMContentLoaded", function () {
+
+  const steps = document.querySelectorAll(".form-step");
+  const indicators = document.querySelectorAll(".step-indicator .step");
+  const stepLabel = document.getElementById("step-label");
+
+  const universitySelect = document.getElementById("university_id");
+  const facultySelect = document.getElementById("faculty_id");
+  const departmentSelect = document.getElementById("department_id");
+
   let currentStep = 1;
 
-  function showStep(stepNum) {
-    steps.forEach(s => s.classList.remove('active'));
-    document.querySelector(`.form-step[data-step="${stepNum}"]`).classList.add('active');
+  // Reset a dropdown and disable it
+  function resetSelect(select, placeholder) {
+    select.innerHTML = "";
 
-    indicators.forEach((ind, i) => {
-      ind.classList.remove('active', 'done');
-      if (i + 1 < stepNum) ind.classList.add('done');
-      if (i + 1 === stepNum) ind.classList.add('active');
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = placeholder;
+
+    select.appendChild(option);
+    select.disabled = true;
+  }
+
+  // Load faculties belonging to the selected university
+  async function loadFaculties(universityId) {
+
+    resetSelect(facultySelect, "Loading faculties...");
+    resetSelect(departmentSelect, "Select a department");
+
+    if (!universityId) {
+      resetSelect(facultySelect, "Select a faculty");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/universities/${encodeURIComponent(universityId)}/faculties`
+      );
+
+      if (!response.ok) {
+        throw new Error("Unable to load faculties.");
+      }
+
+      const faculties = await response.json();
+
+      resetSelect(facultySelect, "Select a faculty");
+
+      faculties.forEach(faculty => {
+        const option = document.createElement("option");
+
+        option.value = faculty.id;
+        option.textContent = faculty.name;
+
+        facultySelect.appendChild(option);
+      });
+
+      facultySelect.disabled = false;
+
+    } catch (error) {
+      resetSelect(facultySelect, "Could not load faculties");
+      console.error(error);
+    }
+  }
+
+  // Load departments belonging to the selected faculty
+  async function loadDepartments(facultyId) {
+
+    resetSelect(departmentSelect, "Loading departments...");
+
+    if (!facultyId) {
+      resetSelect(departmentSelect, "Select a department");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/faculties/${encodeURIComponent(facultyId)}/departments`
+      );
+
+      if (!response.ok) {
+        throw new Error("Unable to load departments.");
+      }
+
+      const departments = await response.json();
+
+      resetSelect(departmentSelect, "Select a department");
+
+      departments.forEach(department => {
+        const option = document.createElement("option");
+
+        option.value = department.id;
+        option.textContent = department.name;
+
+        departmentSelect.appendChild(option);
+      });
+
+      departmentSelect.disabled = false;
+
+    } catch (error) {
+      resetSelect(departmentSelect, "Could not load departments");
+      console.error(error);
+    }
+  }
+
+  // University selection
+universitySelect.addEventListener("change", function () {
+  loadFaculties(this.value);
+});
+
+// Load faculties if a university is already selected
+if (universitySelect.value) {
+  loadFaculties(universitySelect.value);
+}
+
+  // Faculty selection
+  facultySelect.addEventListener("change", function () {
+    loadDepartments(this.value);
+  });
+
+  // Step navigation
+  function showStep(stepNum) {
+
+    steps.forEach(step => {
+      step.classList.remove("active");
+    });
+
+    document.querySelector(
+      `.form-step[data-step="${stepNum}"]`
+    ).classList.add("active");
+
+    indicators.forEach((indicator, index) => {
+
+      indicator.classList.remove("active", "done");
+
+      if (index + 1 < stepNum) {
+        indicator.classList.add("done");
+      }
+
+      if (index + 1 === stepNum) {
+        indicator.classList.add("active");
+      }
+
     });
 
     stepLabel.textContent = `Step ${stepNum} of 3`;
     currentStep = stepNum;
   }
 
+  // Validate fields in the current step
   function validateCurrentStep() {
-    const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
-    const requiredFields = currentStepEl.querySelectorAll('input[required], select[required]');
+
+    const currentStepElement = document.querySelector(
+      `.form-step[data-step="${currentStep}"]`
+    );
+
+    const requiredFields = currentStepElement.querySelectorAll(
+      "input[required], select[required]"
+    );
 
     let firstInvalid = null;
 
     for (const field of requiredFields) {
-      if (!field.value || field.value.trim() === '') {
-        field.classList.add('field-error');
-        if (!firstInvalid) firstInvalid = field;
+
+      if (!field.value || field.value.trim() === "") {
+
+        field.classList.add("field-error");
+
+        if (!firstInvalid) {
+          firstInvalid = field;
+        }
+
       } else {
-        field.classList.remove('field-error');
+        field.classList.remove("field-error");
       }
+
     }
 
     if (firstInvalid) {
       firstInvalid.focus();
       return false;
     }
+
     return true;
   }
 
-  document.querySelectorAll('.next-step').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (!validateCurrentStep()) return;
-      if (currentStep < 3) showStep(currentStep + 1);
+  document.querySelectorAll(".next-step").forEach(button => {
+
+    button.addEventListener("click", function () {
+
+      if (!validateCurrentStep()) {
+        return;
+      }
+
+      if (currentStep < 3) {
+        showStep(currentStep + 1);
+      }
+
     });
+
   });
 
-  document.querySelectorAll('.prev-step').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (currentStep > 1) showStep(currentStep - 1);
+  document.querySelectorAll(".prev-step").forEach(button => {
+
+    button.addEventListener("click", function () {
+
+      if (currentStep > 1) {
+        showStep(currentStep - 1);
+      }
+
     });
+
   });
+
+});
 </script>
 
 </body>

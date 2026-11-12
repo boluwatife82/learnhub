@@ -14,8 +14,15 @@ elif _db_url.startswith("postgresql://"):
 
 class BaseConfig:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
+    
     SQLALCHEMY_DATABASE_URI = _db_url or None
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    }
+
     UPLOAD_FOLDER = os.path.join(BASE_DIR, "app", "static", "uploads")
     MAX_CONTENT_LENGTH = 25 * 1024 * 1024  # 25 MB max upload size
 

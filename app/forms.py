@@ -5,29 +5,83 @@ from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional
 from wtforms.widgets import ListWidget, CheckboxInput
 
 
+
 class RegisterForm(FlaskForm):
-    full_name = StringField("Full Name", validators=[DataRequired(), Length(max=150)])
-    email = StringField("Email", validators=[DataRequired(), Email()])
-    password = PasswordField("Password", validators=[DataRequired(), Length(min=6)])
-    confirm_password = PasswordField(
-        "Confirm Password", validators=[DataRequired(), EqualTo("password", message="Passwords must match")]
-    )
-    role = SelectField(
-        "Role",
-        choices=[("student", "Student"), ("lecturer", "Lecturer"), ("alumni", "Alumni")],
-        validators=[Optional()],
+    # General account fields
+    full_name = StringField(
+        "Full Name",
+        validators=[DataRequired(), Length(max=150)]
     )
 
-    # Student-specific fields
-    matric_number = StringField("Matric Number", validators=[Optional()])
-    department_id = SelectField("Department", coerce=int, validators=[Optional()])
-    level_id = SelectField("Level", coerce=int, validators=[Optional()])
+    email = StringField(
+        "Email",
+        validators=[DataRequired(), Email()]
+    )
+
+    password = PasswordField(
+        "Password",
+        validators=[DataRequired(), Length(min=6)]
+    )
+
+    confirm_password = PasswordField(
+        "Confirm Password",
+        validators=[
+            DataRequired(),
+            EqualTo("password", message="Passwords must match")
+        ]
+    )
+
+    role = SelectField(
+        "Role",
+        choices=[
+            ("student", "Student"),
+            ("lecturer", "Lecturer"),
+            ("alumni", "Alumni")
+        ],
+        validators=[Optional()]
+    )
+
+    # Student academic information
+    matric_number = StringField(
+        "Matric Number",
+        validators=[Optional()]
+    )
+
+    university_id = SelectField(
+        "University",
+        coerce=int,
+        validators=[Optional()]
+    )
+
+    faculty_id = SelectField(
+        "Faculty",
+        coerce=int,
+        validators=[Optional()]
+    )
+
+    department_id = SelectField(
+        "Department",
+        coerce=int,
+        validators=[Optional()]
+    )
+
+    level_id = SelectField(
+        "Level",
+        coerce=int,
+        validators=[Optional()]
+    )
+
     preferred_resource_type = SelectField(
         "Preferred Resource Type",
-        choices=[("pdf", "PDF"), ("video", "Video"), ("textbook", "Textbook"), ("notes", "Notes")],
-        validators=[Optional()],
+        choices=[
+            ("pdf", "PDF"),
+            ("video", "Video"),
+            ("textbook", "Textbook"),
+            ("notes", "Notes")
+        ],
+        validators=[Optional()]
     )
-   
+
     interest_tags = SelectMultipleField(
         "Learning Preferences",
         choices=[
@@ -40,6 +94,7 @@ class RegisterForm(FlaskForm):
             ("Goal: Practical Skills", "Learn Practical Skills"),
             ("Goal: Career Prep", "Prepare for Career Opportunities"),
             ("Goal: Deeper Understanding", "Gain Deeper Understanding"),
+
             # Learning Style
             ("Style: Reading Notes", "Reading Notes and PDFs"),
             ("Style: Video Tutorials", "Watching Video Tutorials"),
@@ -49,10 +104,12 @@ class RegisterForm(FlaskForm):
             ("Style: Case Studies", "Case Studies"),
             ("Style: Research-based", "Research-based Learning"),
             ("Style: Step-by-step", "Step-by-step Tutorials"),
+
             # Resource Format
             ("Format: Lecture Slides", "Lecture Slides"),
             ("Format: Research Papers", "Research Papers"),
             ("Format: Past Questions", "Past Questions"),
+
             # Academic Interests
             ("Interest: Technology", "Technology & Computing"),
             ("Interest: Engineering", "Engineering"),
@@ -65,21 +122,39 @@ class RegisterForm(FlaskForm):
         ],
         widget=ListWidget(prefix_label=False),
         option_widget=CheckboxInput(),
-        validators=[Optional()],
+        validators=[Optional()]
     )
-    # Lecturer-specific fields
-    faculty_id = SelectField("Faculty", coerce=int, validators=[Optional()])
-    specialization = StringField("Area of Specialization", validators=[Optional()])
 
-    # Alumni-specific fields
-    graduation_year = IntegerField("Graduation Year", validators=[Optional()])
-    degree_class = StringField("Degree Class", validators=[Optional()])
+    # Lecturer-specific information
+    specialization = StringField(
+        "Area of Specialization",
+        validators=[Optional()]
+    )
+
+    # Alumni-specific information
+    graduation_year = IntegerField(
+        "Graduation Year",
+        validators=[Optional()]
+    )
+
+    degree_class = StringField(
+        "Degree Class",
+        validators=[Optional()]
+    )
 
     verification_document = FileField(
         "Verification Document (Certificate, ID, or Transcript)",
-        validators=[Optional(), FileAllowed(["pdf", "jpg", "jpeg", "png"], "PDF or image files only!")]
+        validators=[
+            Optional(),
+            FileAllowed(
+                ["pdf", "jpg", "jpeg", "png"],
+                "PDF or image files only!"
+            )
+        ]
     )
+
     submit = SubmitField("Register")
+
 
 
 class LoginForm(FlaskForm):
@@ -137,9 +212,7 @@ class UniversityForm(FlaskForm):
     submit_university = SubmitField("Add University")
 
 
-class UniversityForm(FlaskForm):
-    name = StringField("University Name", validators=[DataRequired(), Length(max=150)])
-    submit_university = SubmitField("Add University")
+
 
 class RecommendationSettingsForm(FlaskForm):
     content_weight = StringField("Content-Based Weight", validators=[DataRequired()])

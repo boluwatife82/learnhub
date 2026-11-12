@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,17 +18,24 @@
         <div class="brand-badge"><i class="fa-solid fa-graduation-cap"></i></div>
         <span>LearnHub</span>
       </div>
+
       <h1>Share your expertise with students</h1>
       <p class="lead">Upload resources and guide students toward what actually works.</p>
-      <img class="illustration" src="{{ url_for('static', filename='img/lecturer-illustration.png') }}" alt="Lecturer teaching">
+
+      <img class="illustration"
+           src="{{ url_for('static', filename='img/lecturer-illustration.png') }}"
+           alt="Lecturer teaching">
     </div>
 
     <div class="auth-form-side">
-      <a href="{{ url_for('auth.landing') }}" style="display:inline-flex; align-items:center; gap:6px; color: var(--muted); font-size:0.85rem; margin-bottom:16px;">
+
+      <a href="{{ url_for('auth.landing') }}"
+         style="display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:0.85rem; margin-bottom:16px;">
         <i class="fa-solid fa-arrow-left"></i> Back to home
       </a>
+
       <h2>Create Lecturer Profile</h2>
-      <p class="subtitle">Tell us about your department and specialization.</p>
+      <p class="subtitle">Tell us about your university, faculty, department and specialization.</p>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -37,13 +45,14 @@
         {% endif %}
       {% endwith %}
 
-            <form method="POST" enctype="multipart/form-data" novalidate>
+      <form method="POST" enctype="multipart/form-data" novalidate id="lecturer-register-form">
+
         {{ form.hidden_tag() }}
 
         {% if form.errors %}
           <div class="flash flash-danger">
             <strong>Please fix the following:</strong>
-            <ul style="margin: 8px 0 0 20px;">
+            <ul style="margin:8px 0 0 20px;">
               {% for field_name, error_list in form.errors.items() %}
                 {% for error in error_list %}
                   <li>{{ field_name }}: {{ error }}</li>
@@ -63,18 +72,26 @@
           {{ form.email(placeholder="you@example.com", required=true) }}
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            {{ form.faculty_id.label }}
-            {{ form.faculty_id(required=true) }}
-          </div>
-          <div class="form-group">
-            {{ form.department_id.label }}
-            {{ form.department_id(required=true) }}
-          </div>
+        <div class="form-group">
+          {{ form.university_id.label }}
+          {{ form.university_id(required=true) }}
         </div>
 
-                <div class="form-group">
+        <div class="form-row">
+
+          <div class="form-group">
+            {{ form.faculty_id.label }}
+            {{ form.faculty_id(required=true, disabled=true) }}
+          </div>
+
+          <div class="form-group">
+            {{ form.department_id.label }}
+            {{ form.department_id(required=true, disabled=true) }}
+          </div>
+
+        </div>
+
+        <div class="form-group">
           {{ form.specialization.label }}
           {{ form.specialization(placeholder="e.g. Machine Learning, Networks") }}
         </div>
@@ -82,30 +99,146 @@
         <div class="form-group">
           {{ form.verification_document.label }}
           {{ form.verification_document() }}
-          <p style="font-size:0.75rem; color: var(--muted); margin-top:4px;">Upload your staff ID, appointment letter, or department verification document for admin review.</p>
+          <p style="font-size:0.75rem; color:var(--muted); margin-top:4px;">
+            Upload your staff ID, appointment letter, or department verification document for admin review.
+          </p>
         </div>
 
         <div class="form-row">
+
           <div class="form-group">
             {{ form.password.label }}
             {{ form.password(placeholder="Create a strong password", required=true) }}
           </div>
+
           <div class="form-group">
             {{ form.confirm_password.label }}
             {{ form.confirm_password(placeholder="Confirm your password", required=true) }}
           </div>
+
         </div>
 
         {{ form.submit(class="btn btn-success btn-block") }}
+
       </form>
 
-      <p style="text-align:center; margin-top: 20px; font-size: 0.9rem;">
-        Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
+      <p style="text-align:center; margin-top:20px; font-size:0.9rem;">
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}">Login here</a>
       </p>
-    </div>
 
+    </div>
   </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const universitySelect = document.getElementById("university_id");
+  const facultySelect = document.getElementById("faculty_id");
+  const departmentSelect = document.getElementById("department_id");
+
+  function resetSelect(select, placeholder) {
+    select.innerHTML = "";
+
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = placeholder;
+
+    select.appendChild(option);
+    select.disabled = true;
+  }
+
+  async function loadFaculties(universityId) {
+
+    resetSelect(facultySelect, "Loading faculties...");
+    resetSelect(departmentSelect, "Select a department");
+
+    if (!universityId) {
+      resetSelect(facultySelect, "Select a faculty");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/universities/${encodeURIComponent(universityId)}/faculties`
+      );
+
+      if (!response.ok) {
+        throw new Error("Unable to load faculties.");
+      }
+
+      const faculties = await response.json();
+
+      resetSelect(facultySelect, "Select a faculty");
+
+      faculties.forEach(faculty => {
+        const option = document.createElement("option");
+        option.value = faculty.id;
+        option.textContent = faculty.name;
+        facultySelect.appendChild(option);
+      });
+
+      facultySelect.disabled = false;
+
+    } catch (error) {
+      resetSelect(facultySelect, "Could not load faculties");
+      console.error(error);
+    }
+  }
+
+  async function loadDepartments(facultyId) {
+
+    resetSelect(departmentSelect, "Loading departments...");
+
+    if (!facultyId) {
+      resetSelect(departmentSelect, "Select a department");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/faculties/${encodeURIComponent(facultyId)}/departments`
+      );
+
+      if (!response.ok) {
+        throw new Error("Unable to load departments.");
+      }
+
+      const departments = await response.json();
+
+      resetSelect(departmentSelect, "Select a department");
+
+      departments.forEach(department => {
+        const option = document.createElement("option");
+        option.value = department.id;
+        option.textContent = department.name;
+        departmentSelect.appendChild(option);
+      });
+
+      departmentSelect.disabled = false;
+
+    } catch (error) {
+      resetSelect(departmentSelect, "Could not load departments");
+      console.error(error);
+    }
+  }
+
+  universitySelect.addEventListener("change", function () {
+    loadFaculties(this.value);
+  });
+
+  facultySelect.addEventListener("change", function () {
+    loadDepartments(this.value);
+  });
+
+  // Initialize if a university is already selected
+  if (universitySelect.value) {
+    loadFaculties(universitySelect.value);
+  }
+
+});
+</script>
 
 </body>
 </html>

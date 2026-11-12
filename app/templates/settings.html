@@ -99,4 +99,87 @@
   </form>
 </div>
 
+
+{% if current_user.role == 'lecturer' %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const facultySelect = document.getElementById("faculty_id");
+    const departmentSelect = document.getElementById("department_id");
+
+    if (!facultySelect || !departmentSelect) return;
+
+    function resetDepartment(placeholder) {
+        departmentSelect.innerHTML = "";
+
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = placeholder;
+
+        departmentSelect.appendChild(option);
+        departmentSelect.disabled = true;
+    }
+
+    async function loadDepartments(facultyId, selectedDepartmentId = "") {
+
+        resetDepartment("Loading departments...");
+
+        if (!facultyId) {
+            resetDepartment("Select a department");
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `/api/faculties/${encodeURIComponent(facultyId)}/departments`
+            );
+
+            if (!response.ok) {
+                throw new Error("Unable to load departments.");
+            }
+
+            const departments = await response.json();
+
+            resetDepartment("Select a department");
+
+            departments.forEach(department => {
+                const option = document.createElement("option");
+
+                option.value = department.id;
+                option.textContent = department.name;
+
+                departmentSelect.appendChild(option);
+            });
+
+            departmentSelect.disabled = false;
+
+            // Restore the lecturer's existing department on page load
+            if (selectedDepartmentId) {
+                departmentSelect.value = selectedDepartmentId;
+            }
+
+        } catch (error) {
+            resetDepartment("Could not load departments");
+            console.error(error);
+        }
+    }
+
+    // When faculty changes, load its departments
+    facultySelect.addEventListener("change", function () {
+        loadDepartments(this.value);
+    });
+
+    // Preserve the existing department when opening settings
+    const existingDepartmentId = departmentSelect.value;
+
+    if (facultySelect.value) {
+        loadDepartments(facultySelect.value, existingDepartmentId);
+    } else {
+        resetDepartment("Select a department");
+    }
+
+});
+</script>
+{% endif %}
+
 {% endblock %}
