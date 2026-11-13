@@ -10,58 +10,60 @@ from app.services.recommendation_engine.collaborative import (
 )
 
 from app.services.recommendation_engine.behavioral import (
-    get_behavioral_scores
+    get_behavioral_scores,
+    get_student_interaction_profile
 )
 
 
 def get_hybrid_recommendations(student, limit=10):
-    """
-    Combines three recommendation components:
-
-    1. Content-based similarity.
-    2. Community-driven popularity.
-    3. Individual behavioural relevance.
-
-    The existing admin-configured content and collaborative
-    weights retain their relative proportions and jointly
-    contribute 80% of the final score.
-
-    Individual behaviour contributes the remaining 20%.
-    """
 
     settings = RecommendationSetting.get_current()
 
     content_weight = float(settings.content_weight)
     collaborative_weight = float(settings.collaborative_weight)
 
-    # Preserve the relative proportions of existing settings.
     total_weight = content_weight + collaborative_weight
 
     if total_weight > 0:
-        effective_content_weight = (
-            content_weight / total_weight
-        ) * 0.80
-
-        effective_collaborative_weight = (
-            collaborative_weight / total_weight
-        ) * 0.80
+        content_ratio = content_weight / total_weight
+        popularity_ratio = collaborative_weight / total_weight
     else:
-        # Safe fallback if both configured weights are zero.
-        effective_content_weight = 0.32
-        effective_collaborative_weight = 0.48
+        content_ratio = 0.4
+        popularity_ratio = 0.6
 
-    behavioral_weight = 0.20
+    # Measure the student's existing interaction history.
+    positive_history, negative_history = (
+        get_student_interaction_profile(student)
+    )
 
-    # Get content-based candidate resources.
+    activity = (
+        sum(positive_history.values())
+        + sum(negative_history.values())
+    )
+
+    # Gradually introduce behavioural personalisation.
+    progress = min(activity / 5.0, 1.0)
+
+    behavioral_weight = 0.20 * progress
+
+    # Start with content-based relevance and community popularity.
+    content_effective_weight = (
+        0.80 - (0.48 * progress)
+    )
+
+    popularity_effective_weight = (
+        0.20 + (0.28 * progress)
+    )
+
+    # Get a wider pool of academically eligible resources.
     content_results = get_content_based_recommendations(
         student,
-        limit=50
+        limit=500
     )
 
     if not content_results:
         return []
 
-    # Calculate individual behavioural scores for candidates.
     candidate_resources = [
         resource for resource, score in content_results
     ]
@@ -75,27 +77,21 @@ def get_hybrid_recommendations(student, limit=10):
 
     for resource, content_score in content_results:
 
-        # Community popularity score.
         popularity_score = get_popularity_score(resource)
 
-        # Individual behavioural relevance.
         behavioral_score = behavioral_scores.get(
             resource.id,
             0.0
         )
 
-        # Combine all three recommendation signals.
-        hybrid_score = (
-            (float(content_score) * effective_content_weight)
-            +
-            (float(popularity_score) * effective_collaborative_weight)
-            +
-            (float(behavioral_score) * behavioral_weight)
+        final_score = (
+            float(content_score) * content_effective_weight
+            + float(popularity_score) * popularity_effective_weight
+            + float(behavioral_score) * behavioral_weight
         )
 
-        hybrid_scores.append((resource, hybrid_score))
+        hybrid_scores.append((resource, final_score))
 
-    # Rank resources from highest to lowest score.
     hybrid_scores.sort(
         key=lambda pair: pair[1],
         reverse=True
