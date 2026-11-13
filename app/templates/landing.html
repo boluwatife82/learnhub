@@ -14,50 +14,134 @@
 <!-- HERO -->
 <section class="landing-hero">
   <nav class="landing-nav">
-    <div class="brand">
-      <div class="brand-badge"><i class="fa-solid fa-graduation-cap"></i></div>
+    <a href="/" class="brand">
+      <div class="brand-badge">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
       LearnHub
-    </div>
+    </a>
+
     <div class="landing-nav-links">
+      <a href="#top">Home</a>
       <a href="#how-it-works">How it works</a>
       <a href="#for-everyone">Who it's for</a>
       <a href="{{ url_for('auth.login') }}">Login</a>
-      <a href="{{ url_for('auth.register_choice') }}" class="btn btn-primary">Get Started</a>
+      <a href="{{ url_for('auth.register_choice') }}" class="btn btn-primary">
+        Get Started <i class="fa-solid fa-arrow-right"></i>
+      </a>
     </div>
   </nav>
 
-  <div class="hero-grid">
-    <div>
-      <div class="hero-eyebrow"><span class="dot"></span> Built for Nigerian university students</div>
-      <h1 class="hero-headline">Find the notes<br>your <em>seniors</em> wish<br>they'd had.</h1>
-      <p class="hero-sub">
-        LearnHub matches you with past questions, lecture notes, and video walkthroughs from your own department —
-        ranked by what actually helped students like you, not just what's popular everywhere.
-      </p>
-      <div class="hero-ctas">
-        <a href="{{ url_for('auth.register_choice') }}" class="btn btn-primary">Create your account</a>
-        <a href="#how-it-works" class="btn btn-outline" style="background:transparent; border-color: rgba(255,255,255,0.25); color:#fff;">See how it works</a>
+  <div class="hero-content" id="top">
+    <div class="hero-copy">
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        BUILT FOR NIGERIAN UNIVERSITY STUDENTS
       </div>
-      
+
+      <h1 class="hero-headline">
+        Find the resources<br>
+        your <em>success</em><br>
+        deserves.
+      </h1>
+
+      <p class="hero-sub">
+        Stop searching endlessly for the right study materials.
+        Discover lecture notes, past questions, textbooks and
+        video resources matched to your department, academic
+        level and interests.
+      </p>
+
+      <div class="hero-ctas">
+        <a href="{{ url_for('auth.register_choice') }}" class="btn btn-primary">
+          Get Started <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <a href="#how-it-works" class="btn btn-outline hero-secondary-btn">
+          <i class="fa-regular fa-circle-play"></i>
+          Explore LearnHub
+        </a>
+      </div>
+
+      <div class="hero-trust">
+        <div class="hero-trust-item">
+          <i class="fa-solid fa-check-circle"></i>
+          Personalised learning
+        </div>
+        <div class="hero-trust-item">
+          <i class="fa-solid fa-check-circle"></i>
+          Department-focused
+        </div>
+        <div class="hero-trust-item">
+          <i class="fa-solid fa-check-circle"></i>
+          Community-powered
+        </div>
+      </div>
     </div>
 
-    <div class="hero-feed" id="hero-feed">
-      {% for resource in recent_resources %}
-        <div class="feed-card" data-index="{{ loop.index0 }}">
-          <div class="feed-card-label">
-            {% if resource.resource_type == 'pdf' %}<i class="fa-solid fa-file-pdf"></i>{% endif %}
-            {% if resource.resource_type == 'youtube' %}<i class="fa-brands fa-youtube"></i>{% endif %}
-            {% if resource.resource_type == 'textbook' %}<i class="fa-solid fa-book"></i>{% endif %}
-            {{ resource.resource_type|upper }} &middot; {{ resource.course.course_code }}
-          </div>
-          <div class="feed-card-title">{{ resource.title }}</div>
-          <div class="feed-card-meta">{{ resource.department.name }} &middot; shared by {{ resource.uploader.full_name }}</div>
-        </div>
-      {% endfor %}
-      <div class="hero-feed-caption">Live from the resource library</div>
+    
+<div class="hero-resource-stack">
+  <div class="resource-stack-heading">
+    <span class="live-dot"></span>
+    LIVE FROM THE LEARNHUB LIBRARY
+  </div>
+
+  {% for resource in recent_resources[:3] %}
+    <div class="hero-resource-card">
+
+      <div class="resource-type-icon
+        {% if resource.resource_type == 'pdf' %}pdf-icon
+        {% elif resource.resource_type == 'youtube' %}video-icon
+        {% else %}book-icon{% endif %}">
+
+        {% if resource.resource_type == 'pdf' %}
+          <i class="fa-solid fa-file-pdf"></i>
+        {% elif resource.resource_type == 'youtube' %}
+          <i class="fa-brands fa-youtube"></i>
+        {% else %}
+          <i class="fa-solid fa-book"></i>
+        {% endif %}
+      </div>
+
+      <div class="hero-resource-info">
+        <span class="hero-resource-type">
+          {{ resource.resource_type|upper }}
+          {% if resource.course %}
+            · {{ resource.course.course_code }}
+          {% endif %}
+        </span>
+
+        <strong>{{ resource.title }}</strong>
+
+        <span class="hero-resource-meta">
+          {{ resource.department.name if resource.department else 'University Resource' }}
+        </span>
+      </div>
+
+      <i class="fa-solid fa-arrow-up-right-from-square resource-open-icon"></i>
     </div>
+  {% else %}
+    <div class="hero-resource-card">
+      <div class="hero-resource-info">
+        <strong>Learning resources are coming soon.</strong>
+        <span class="hero-resource-meta">Check back for new materials.</span>
+      </div>
+    </div>
+  {% endfor %}
+
+  <div class="resource-stack-footer">
+    <i class="fa-solid fa-circle-check"></i>
+    Reviewed learning resources
+  </div>
+</div>
+
+  </div>
+
+  <div class="hero-bottom-label">
+    
+    <i class="fa-solid fa-arrow-down"></i>
   </div>
 </section>
+
 
 <!-- STATS STRIP -->
 <div class="stats-strip">
