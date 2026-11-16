@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% set active_page = "browse" %}
 
@@ -29,37 +30,35 @@
     <div class="form-row">
       <div class="form-group">
         {{ form.university_id.label }}
-        {{ form.university_id() }}
+        {{ form.university_id(id="university_id") }}
       </div>
       <div class="form-group">
         {{ form.faculty_id.label }}
-        {{ form.faculty_id() }}
+        {{ form.faculty_id(id="faculty_id") }}
       </div>
     </div>
 
     <div class="form-row">
       <div class="form-group">
         {{ form.department_id.label }}
-        {{ form.department_id() }}
+        {{ form.department_id(id="department_id") }}
       </div>
       <div class="form-group">
         {{ form.level_id.label }}
-        {{ form.level_id() }}
+        {{ form.level_id(id="level_id") }}
       </div>
     </div>
 
     <div class="form-group">
       {{ form.course_id.label }}
-      {{ form.course_id() }}
+      {{ form.course_id(id="course_id") }}
     </div>
 
-    <!-- Shown only when resource_type = pdf -->
     <div class="form-group" id="file-field">
       {{ form.file.label }}
       {{ form.file() }}
     </div>
 
-    <!-- Shown only when resource_type = youtube or textbook -->
     <div class="form-group" id="link-field">
       {{ form.external_link.label }}
       {{ form.external_link(placeholder="https://... or a textbook citation") }}
@@ -70,22 +69,123 @@
 </div>
 
 <script>
-  const typeSelect = document.getElementById('resource_type');
-  const fileField = document.getElementById('file-field');
-  const linkField = document.getElementById('link-field');
+document.addEventListener("DOMContentLoaded", function () {
+    const university = document.getElementById("university_id");
+    const faculty = document.getElementById("faculty_id");
+    const department = document.getElementById("department_id");
+    const level = document.getElementById("level_id");
+    const course = document.getElementById("course_id");
 
-  function toggleFields() {
-    if (typeSelect.value === 'pdf') {
-      fileField.style.display = 'block';
-      linkField.style.display = 'none';
-    } else {
-      fileField.style.display = 'none';
-      linkField.style.display = 'block';
+    const typeSelect = document.getElementById("resource_type");
+    const fileField = document.getElementById("file-field");
+    const linkField = document.getElementById("link-field");
+
+    function resetSelect(select, placeholder) {
+        select.innerHTML = "";
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = placeholder;
+        select.appendChild(option);
+        select.disabled = true;
     }
-  }
 
-  typeSelect.addEventListener('change', toggleFields);
-  toggleFields(); // run once on page load
+    async function loadOptions(url, select, placeholder) {
+        resetSelect(select, "Loading...");
+
+        try {
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error("Could not load options");
+            }
+
+            const items = await response.json();
+
+            resetSelect(select, placeholder);
+
+            items.forEach(item => {
+                const option = document.createElement("option");
+                option.value = item.id;
+                option.textContent = item.name;
+                select.appendChild(option);
+            });
+
+            select.disabled = items.length === 0;
+        } catch (error) {
+            console.error(error);
+            resetSelect(select, "Could not load options");
+        }
+    }
+
+    university.addEventListener("change", function () {
+        resetSelect(faculty, "Select Faculty");
+        resetSelect(department, "Select Department");
+        resetSelect(course, "Select Course");
+
+        if (this.value) {
+            loadOptions(
+                `/api/universities/${this.value}/faculties`,
+                faculty,
+                "Select Faculty"
+            );
+        }
+    });
+
+    faculty.addEventListener("change", function () {
+        resetSelect(department, "Select Department");
+        resetSelect(course, "Select Course");
+
+        if (this.value) {
+            loadOptions(
+                `/api/faculties/${this.value}/departments`,
+                department,
+                "Select Department"
+            );
+        }
+    });
+
+    function updateCourses() {
+        resetSelect(course, "Select Course");
+
+        if (department.value && level.value) {
+            loadOptions(
+                `/api/departments/${department.value}/courses?level_id=${level.value}`,
+                course,
+                "Select Course"
+            );
+        }
+    }
+
+    department.addEventListener("change", updateCourses);
+    level.addEventListener("change", updateCourses);
+
+    function toggleFields() {
+        if (typeSelect.value === "pdf") {
+            fileField.style.display = "block";
+            linkField.style.display = "none";
+        } else {
+            fileField.style.display = "none";
+            linkField.style.display = "block";
+        }
+    }
+
+    typeSelect.addEventListener("change", toggleFields);
+    toggleFields();
+
+    // Initialize dropdowns using the currently selected university.
+if (university.value) {
+    loadOptions(
+        `/api/universities/${university.value}/faculties`,
+        faculty,
+        "Select Faculty"
+    );
+} else {
+    resetSelect(faculty, "Select Faculty");
+}
+
+resetSelect(department, "Select Department");
+resetSelect(course, "Select Course");
+});
 </script>
 
 {% endblock %}

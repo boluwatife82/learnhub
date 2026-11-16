@@ -728,3 +728,27 @@ def api_faculty_departments(faculty_id):
         }
         for department in departments
     ])
+
+
+
+@auth_bp.route("/api/departments/<int:department_id>/courses")
+def api_department_courses(department_id):
+    level_id = request.args.get("level_id", type=int)
+
+    department = Department.query.get_or_404(department_id)
+
+    if not level_id:
+        return jsonify([])
+
+    courses = Course.query.filter_by(
+        department_id=department.id,
+        level_id=level_id
+    ).order_by(Course.course_code).all()
+
+    return jsonify([
+        {
+            "id": course.id,
+            "name": f"{course.course_code} - {course.course_title}"
+        }
+        for course in courses
+    ])

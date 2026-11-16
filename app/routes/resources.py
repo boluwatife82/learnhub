@@ -6,8 +6,11 @@ from app.forms import ResourceUploadForm
 from app.models import University, Faculty, Department, Level, Course, Resource, Rating, Vote, Download, UserInteraction, Bookmark
 from app.models.interaction import Bookmark
 from app.services.storage.file_storage import save_file
+from flask import current_app, request
 
 resources_bp = Blueprint("resources", __name__)
+
+
 
 
 @resources_bp.route("/resources/upload", methods=["GET", "POST"])
@@ -15,42 +18,105 @@ resources_bp = Blueprint("resources", __name__)
 def upload():
     form = ResourceUploadForm()
 
-    form.university_id.choices = [(u.id, u.name) for u in University.query.all()]
-    form.faculty_id.choices = [(f.id, f.name) for f in Faculty.query.all()]
-    form.department_id.choices = [(d.id, d.name) for d in Department.query.all()]
-    form.level_id.choices = [(l.id, l.level_number) for l in Level.query.all()]
-    form.course_id.choices = [(c.id, f"{c.course_code} - {c.course_title}") for c in Course.query.all()]
+    # Populate university and level choices.
+    form.university_id.choices = [
+        (u.id, u.name)
+        for u in University.query.order_by(University.name).all()
+    ]
+
+    form.level_id.choices = [
+        (l.id, str(l.level_number))
+        for l in Level.query.order_by(Level.level_number).all()
+    ]
+
+    # Populate dependent choices using submitted IDs on POST.
+    university_id = form.university_id.data
+    faculty_id = form.faculty_id.data
+    department_id = form.department_id.data
+    level_id = form.level_id.data
+
+    faculties = Faculty.query.filter_by(
+        university_id=university_id
+    ).order_by(Faculty.name).all() if university_id else []
+
+    departments = Department.query.filter_by(
+        faculty_id=faculty_id
+    ).order_by(Department.name).all() if faculty_id else []
+
+    courses = Course.query.filter_by(
+        department_id=department_id,
+        level_id=level_id
+    ).order_by(Course.course_code).all() if department_id and level_id else []
+
+    form.faculty_id.choices = [(f.id, f.name) for f in faculties]
+    form.department_id.choices = [(d.id, d.name) for d in departments]
+    form.course_id.choices = [
+        (c.id, f"{c.course_code} - {c.course_title}")
+        for c in courses
+    ]
 
     if form.validate_on_submit():
-        if form.resource_type.data == "pdf":
-            if not form.file.data:
-                flash("Please attach a PDF file.", "danger")
-                return render_template("upload_resource.html", form=form)
-            file_url = save_file(form.file.data)
-        else:
-            if not form.external_link.data:
-                flash("Please provide a link/reference.", "danger")
-                return render_template("upload_resource.html", form=form)
-            file_url = form.external_link.data
+        faculty = Faculty.query.get(form.faculty_id.data)
+        department = Department.query.get(form.department_id.data)
+        course = Course.query.get(form.course_id.data)
 
-        new_resource = Resource(
-            title=form.title.data,
-            description=form.description.data,
-            resource_type=form.resource_type.data,
-            file_url=file_url,
-            university_id=form.university_id.data,
-            faculty_id=form.faculty_id.data,
-            department_id=form.department_id.data,
-            level_id=form.level_id.data,
-            course_id=form.course_id.data,
-            uploaded_by=current_user.id,
-            status="pending",
-        )
-        db.session.add(new_resource)
-        db.session.commit()
+        if (
+            not faculty
+            or faculty.university_id != form.university_id.data
+            or not department
+            or department.faculty_id != faculty.id
+            or not course
+            or course.department_id != department.id
+            or course.level_id != form.level_id.data
+        ):
+            flash("Invalid academic selection. Please select your academic details again.", "danger")
+            return redirect(url_for("resources.upload"))
 
-        flash("Resource submitted for admin review.", "success")
-        return redirect(url_for("auth.dashboard"))
+        try:
+            if form.resource_type.data == "pdf":
+                if not form.file.data:
+                    flash("Please attach a PDF file.", "danger")
+                    return redirect(url_for("resources.upload"))
+
+                file_url = save_file(form.file.data)
+            else:
+                if not form.external_link.data:
+                    flash("Please provide a link or textbook reference.", "danger")
+                    return redirect(url_for("resources.upload"))
+
+                file_url = form.external_link.data.strip()
+
+            new_resource = Resource(
+                title=form.title.data.strip(),
+                description=form.description.data,
+                resource_type=form.resource_type.data,
+                file_url=file_url,
+                university_id=form.university_id.data,
+                faculty_id=form.faculty_id.data,
+                department_id=form.department_id.data,
+                level_id=form.level_id.data,
+                course_id=form.course_id.data,
+                uploaded_by=current_user.id,
+                status="pending",
+            )
+
+            db.session.add(new_resource)
+            db.session.commit()
+
+            flash("Resource submitted successfully and is awaiting admin approval.", "success")
+            return redirect(url_for("auth.dashboard"))
+
+        except Exception:
+            db.session.rollback()
+            current_app.logger.exception("Resource upload failed")
+            flash("Upload failed. Please try again.", "danger")
+            return redirect(url_for("resources.upload"))
+
+    if request.method == "POST":
+        current_app.logger.warning("Resource upload validation errors: %s", form.errors)
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{field}: {error}", "danger")
 
     return render_template("upload_resource.html", form=form)
 
