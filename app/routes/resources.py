@@ -72,6 +72,22 @@ def upload():
             flash("Invalid academic selection. Please select your academic details again.", "danger")
             return redirect(url_for("resources.upload"))
 
+                # Students can only upload resources for levels they have completed.
+        if current_user.role == "student":
+            student = current_user.student_profile
+            selected_level = Level.query.get(form.level_id.data)
+
+            if not student or not student.level or not selected_level:
+                flash("Unable to verify your academic level. Please contact the admin.", "danger")
+                return redirect(url_for("resources.upload"))
+
+            if selected_level.level_number >= student.level.level_number:
+                flash(
+                    "You can only upload resources for levels you have already completed.",
+                    "danger"
+                )
+                return redirect(url_for("resources.upload"))
+
         try:
             if form.resource_type.data == "pdf":
                 if not form.file.data:
